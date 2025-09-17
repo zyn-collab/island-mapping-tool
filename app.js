@@ -621,6 +621,13 @@ class MappingApp {
      * @param {Object} category - Selected category object
      */
     selectCategory(category) {
+        this.clearDynamicFields();
+        // Also hide sections that are shown on subcategory selection
+        document.getElementById('notes-section').style.display = 'none';
+        document.getElementById('tags-section').style.display = 'none';
+        document.getElementById('photos-section').style.display = 'none';
+        document.getElementById('submit-section').style.display = 'none';
+
         // DIRECT NAVIGATION: If there's only one subcategory, select it automatically.
         if (category.subcategories && category.subcategories.length === 1) {
             this.formData.category = category.code;
