@@ -769,10 +769,6 @@ body {
   margin-bottom: 10px;
 }
 
-.screen-header {
-  position: relative;
-}
-
 .screen-header .btn-sm {
   position: absolute;
   top: 0;

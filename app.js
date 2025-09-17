@@ -32,11 +32,15 @@ class MappingApp {
      */
     async init() {
         try {
+            console.log('Initializing mapping app...');
+            
             // Load configuration from config.json
             await this.loadConfig();
+            console.log('Config loaded successfully');
             
             // Set up event listeners for all interactive elements
             this.setupEventListeners();
+            console.log('Event listeners set up');
             
             // Load any saved draft from localStorage
             this.loadDraft();
@@ -70,10 +74,17 @@ class MappingApp {
      */
     setupEventListeners() {
         // Start screen button
-        document.getElementById('start-btn').addEventListener('click', () => {
-            this.showScreen('location-screen');
-            this.requestLocation();
-        });
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn) {
+            startBtn.addEventListener('click', () => {
+                console.log('Start button clicked!');
+                this.showScreen('location-screen');
+                this.requestLocation();
+            });
+            console.log('Start button event listener added');
+        } else {
+            console.error('Start button not found!');
+        }
 
         // Location screen buttons
         document.getElementById('recenter-btn').addEventListener('click', () => {
@@ -145,13 +156,21 @@ class MappingApp {
      * @param {string} screenId - ID of the screen to show
      */
     showScreen(screenId) {
+        console.log('Showing screen:', screenId);
+        
         // Hide all screens
         document.querySelectorAll('.screen').forEach(screen => {
             screen.classList.remove('active');
         });
         
         // Show the requested screen
-        document.getElementById(screenId).classList.add('active');
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+            console.log('Screen shown:', screenId);
+        } else {
+            console.error('Screen not found:', screenId);
+        }
         
         // Load form data if showing form screen
         if (screenId === 'form-screen') {
@@ -1266,7 +1285,7 @@ class MappingApp {
                 formData.append(`photo_${index + 1}`, photo);
             });
             
-            // Submit to Google Apps Script endpoint
+            // Submit to endpoint (Google Apps Script or Formspree)
             const response = await fetch(this.config.endpoint_url, {
                 method: 'POST',
                 body: formData
@@ -1276,9 +1295,20 @@ class MappingApp {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            const result = await response.json();
+            // Handle different response formats
+            let result;
+            try {
+                result = await response.json();
+            } catch (e) {
+                // Formspree returns HTML, not JSON
+                if (response.ok) {
+                    result = { success: true };
+                } else {
+                    throw new Error('Submission failed');
+                }
+            }
             
-            if (result.success) {
+            if (result.success || response.ok) {
                 // Clear draft and show success
                 this.clearDraft();
                 this.showScreen('success-screen');

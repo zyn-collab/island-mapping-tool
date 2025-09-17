@@ -362,5 +362,5 @@
   "max_photo_size_mb": 2,
   "photo_compression_quality": 0.8,
   "photo_max_width": 1600,
-  "endpoint_url": "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+  "endpoint_url": "https://script.google.com/macros/s/AKfycbwRkF0dv-JbHjQQ7pY2YGpGGRX7v5BDqZ-Oy9dOmnghDKUgzXeO4glCRKpoyefR2zFYiA/exec"
 }
