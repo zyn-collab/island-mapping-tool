@@ -16,7 +16,7 @@ const CONFIG = {
   SHEET_NAME: 'submissions',
   
   // Allowed domains for CORS (update with your domain)
-  ALLOWED_ORIGINS: ['https://island-mapping-tool.vercel.app/', 'http://island-mapping-tool.vercel.app/', 'http://localhost:3000']
+  ALLOWED_ORIGINS: ['https://island-mapping-tool.vercel.app/', 'http://island-mapping-tool.vercel.app/', 'http://localhost:8000']
 };
 
 /**
@@ -25,23 +25,20 @@ const CONFIG = {
  */
 function doPost(e) {
   try {
-    // Set CORS headers to allow requests from your domain
-    setCorsHeaders();
-    
-    // Parse the incoming data
-    const formData = parseFormData(e);
+    // Data is now sent as a single JSON string, making it easy to parse.
+    const payload = JSON.parse(e.postData.contents);
     
     // Validate the submission data
-    const validationResult = validateSubmission(formData.data);
+    const validationResult = validateSubmission(payload);
     if (!validationResult.valid) {
       return createErrorResponse(validationResult.error, 400);
     }
     
-    // Process photos and get URLs
-    const photoUrls = processPhotos(formData.photos, formData.data.submission_id);
+    // Process photos from the base64 data in the payload
+    const photoUrls = processPhotos(payload.photos || [], payload.submission_id);
     
     // Add photo URLs to the submission data
-    const submissionData = addPhotoUrlsToData(formData.data, photoUrls);
+    const submissionData = addPhotoUrlsToData(payload, photoUrls);
     
     // Append data to Google Sheet
     const sheetResult = appendToSheet(submissionData);
@@ -58,6 +55,7 @@ function doPost(e) {
     
   } catch (error) {
     console.error('Error in doPost:', error);
+    console.error('Request Body: ' + (e ? e.postData.contents : 'No event data'));
     return createErrorResponse('Internal server error: ' + error.message, 500);
   }
 }
@@ -80,83 +78,6 @@ function doGet(e) {
 function setCorsHeaders() {
   // Note: CORS headers in Apps Script are limited
   // You may need to deploy as a web app with proper permissions
-}
-
-/**
- * Parse form data from the incoming request
- * @param {Object} e - The event object from doPost
- * @returns {Object} - Parsed form data with JSON data and photo files
- */
-function parseFormData(e) {
-  const result = {
-    data: null,
-    photos: []
-  };
-  
-  // Parse multipart form data
-  const boundary = e.parameter.boundary || '----WebKitFormBoundary';
-  const body = e.postData.contents;
-  
-  if (!body) {
-    throw new Error('No data received');
-  }
-  
-  // Split by boundary
-  const parts = body.split('--' + boundary);
-  
-  for (let part of parts) {
-    if (part.includes('Content-Disposition: form-data')) {
-      if (part.includes('name="data"')) {
-        // Extract JSON data
-        const jsonStart = part.indexOf('{');
-        const jsonEnd = part.lastIndexOf('}') + 1;
-        if (jsonStart !== -1 && jsonEnd !== -1) {
-          const jsonString = part.substring(jsonStart, jsonEnd);
-          result.data = JSON.parse(jsonString);
-        }
-      } else if (part.includes('name="photo_')) {
-        // Extract photo file
-        const photoData = extractPhotoData(part);
-        if (photoData) {
-          result.photos.push(photoData);
-        }
-      }
-    }
-  }
-  
-  if (!result.data) {
-    throw new Error('No JSON data found in request');
-  }
-  
-  return result;
-}
-
-/**
- * Extract photo data from multipart form part
- * @param {string} part - The multipart form part containing photo data
- * @returns {Object|null} - Photo data object or null if extraction fails
- */
-function extractPhotoData(part) {
-  try {
-    // Find the start of the file data (after headers)
-    const headerEnd = part.indexOf('\r\n\r\n');
-    if (headerEnd === -1) return null;
-    
-    const fileData = part.substring(headerEnd + 4);
-    
-    // Extract filename from headers
-    const filenameMatch = part.match(/filename="([^"]+)"/);
-    const filename = filenameMatch ? filenameMatch[1] : 'photo.jpg';
-    
-    return {
-      filename: filename,
-      data: fileData,
-      contentType: 'image/jpeg'
-    };
-  } catch (error) {
-    console.error('Error extracting photo data:', error);
-    return null;
-  }
 }
 
 /**
@@ -229,12 +150,12 @@ function processPhotos(photos, submissionId) {
     photos.forEach((photo, index) => {
       try {
         // Create filename with submission ID
-        const filename = `${submissionId}_${index + 1}.jpg`;
+        const filename = `${submissionId}_photo_${index + 1}`;
         
-        // Create blob from photo data
+        // Create blob from base64 photo data
         const blob = Utilities.newBlob(
           Utilities.base64Decode(photo.data),
-          photo.contentType,
+          photo.mimeType,
           filename
         );
         

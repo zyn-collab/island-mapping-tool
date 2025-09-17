@@ -21,9 +21,10 @@ class MappingApp {
             notes: '',
             photos: []
         };
+        this.allSubcategories = [];
         
         // Initialize the app when DOM is loaded
-        this.init();
+        // this.init();
     }
 
     /**
@@ -36,6 +37,7 @@ class MappingApp {
             
             // Load configuration from config.json
             await this.loadConfig();
+            this.prepareSearchData(); // Create the searchable list of subcategories
             console.log('Config loaded successfully');
             
             // Set up event listeners for all interactive elements
@@ -76,7 +78,8 @@ class MappingApp {
         // Start screen button
         const startBtn = document.getElementById('start-btn');
         if (startBtn) {
-            startBtn.addEventListener('click', () => {
+            startBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 console.log('Start button clicked!');
                 this.showScreen('location-screen');
                 this.requestLocation();
@@ -87,68 +90,148 @@ class MappingApp {
         }
 
         // Location screen buttons
-        document.getElementById('recenter-btn').addEventListener('click', () => {
-            this.requestLocation();
-        });
+        const recenterBtn = document.getElementById('recenter-btn');
+        if (recenterBtn) {
+            recenterBtn.addEventListener('click', () => {
+                this.requestLocation();
+            });
+        } else {
+            console.error('Recenter button not found!');
+        }
 
-        document.getElementById('manual-search-btn').addEventListener('click', () => {
-            this.toggleManualSearch();
-        });
+        const manualSearchBtn = document.getElementById('manual-search-btn');
+        if (manualSearchBtn) {
+            manualSearchBtn.addEventListener('click', () => {
+                this.toggleManualSearch();
+            });
+        } else {
+            console.error('Manual search button not found!');
+        }
 
-        document.getElementById('search-btn').addEventListener('click', () => {
-            this.performSearch();
-        });
+        const searchBtn = document.getElementById('search-btn');
+        if (searchBtn) {
+            searchBtn.addEventListener('click', () => {
+                this.performSearch();
+            });
+        } else {
+            console.error('Search button not found!');
+        }
 
-        document.getElementById('confirm-location-btn').addEventListener('click', () => {
-            this.confirmLocation();
-        });
+        const confirmLocationBtn = document.getElementById('confirm-location-btn');
+        if (confirmLocationBtn) {
+            confirmLocationBtn.addEventListener('click', () => {
+                this.confirmLocation();
+            });
+        } else {
+            console.error('Confirm location button not found!');
+        }
 
         // Category popup elements
-        document.getElementById('close-popup').addEventListener('click', () => {
-            this.hideCategoryPopup();
-        });
+        const closePopupBtn = document.getElementById('close-popup');
+        if (closePopupBtn) {
+            closePopupBtn.addEventListener('click', () => {
+                this.hideCategoryPopup();
+            });
+        } else {
+            console.error('Close popup button not found!');
+        }
 
         // Form screen elements
-        document.getElementById('subcategory-select').addEventListener('change', (e) => {
-            this.onSubcategoryChange(e.target.value);
-        });
+        const subcategorySelect = document.getElementById('subcategory-select');
+        if (subcategorySelect) {
+            subcategorySelect.addEventListener('change', (e) => {
+                this.onSubcategoryChange(e.target.value);
+            });
+        } else {
+            console.error('Subcategory select not found!');
+        }
 
-        document.getElementById('notes-input').addEventListener('input', (e) => {
-            this.updateNotesCount(e.target.value.length);
-        });
+        const notesInput = document.getElementById('notes-input');
+        if (notesInput) {
+            notesInput.addEventListener('input', (e) => {
+                this.updateNotesCount(e.target.value.length);
+            });
+        } else {
+            console.error('Notes input not found!');
+        }
 
-        document.getElementById('add-photo-btn').addEventListener('click', () => {
-            document.getElementById('photo-input').click();
-        });
+        const addPhotoBtn = document.getElementById('add-photo-btn');
+        if (addPhotoBtn) {
+            addPhotoBtn.addEventListener('click', () => {
+                document.getElementById('photo-input').click();
+            });
+        } else {
+            console.error('Add photo button not found!');
+        }
 
-        document.getElementById('photo-input').addEventListener('change', (e) => {
-            this.handlePhotoUpload(e.target.files);
-        });
+        const photoInput = document.getElementById('photo-input');
+        if (photoInput) {
+            photoInput.addEventListener('change', (e) => {
+                this.handlePhotoUpload(e.target.files);
+            });
+        } else {
+            console.error('Photo input not found!');
+        }
 
-        document.getElementById('submit-btn').addEventListener('click', () => {
-            this.submitForm();
-        });
+        const submitBtn = document.getElementById('submit-btn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => {
+                this.submitForm();
+            });
+        } else {
+            console.error('Submit button not found!');
+        }
 
         // Success screen button
-        document.getElementById('new-entry-btn').addEventListener('click', () => {
-            this.startNewEntry();
-        });
+        const newEntryBtn = document.getElementById('new-entry-btn');
+        if (newEntryBtn) {
+            newEntryBtn.addEventListener('click', () => {
+                this.startNewEntry();
+            });
+        } else {
+            console.error('New entry button not found!');
+        }
+
+        // Search input in popup
+        const categorySearchInput = document.getElementById('category-search-input');
+        if (categorySearchInput) {
+            categorySearchInput.addEventListener('input', (e) => {
+                this.filterCategories(e.target.value);
+            });
+        } else {
+            console.error('Category search input not found!');
+        }
 
         // Navigation buttons
-        document.getElementById('back-to-start').addEventListener('click', () => {
-            this.showScreen('start-screen');
-        });
+        const backToStartBtn = document.getElementById('back-to-start');
+        if (backToStartBtn) {
+            backToStartBtn.addEventListener('click', () => {
+                this.showScreen('start-screen');
+            });
+        } else {
+            console.error('Back to start button not found!');
+        }
 
-        document.getElementById('back-to-location').addEventListener('click', () => {
-            this.showScreen('location-screen');
-        });
+        const backToLocationBtn = document.getElementById('back-to-location');
+        if (backToLocationBtn) {
+            backToLocationBtn.addEventListener('click', () => {
+                this.showScreen('location-screen');
+            });
+        } else {
+            console.error('Back to location button not found!');
+        }
 
         // Search input enter key
-        document.getElementById('search-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.performSearch();
-            }
-        });
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.performSearch();
+                }
+            });
+        } else {
+            console.error('Search input not found!');
+        }
     }
 
     /**
@@ -432,13 +515,16 @@ class MappingApp {
      */
     loadCategoryGrid() {
         console.log('Loading category grid...');
-        const container = document.getElementById('category-grid');
-        if (!container) {
-            console.error('Category grid container not found!');
+        const quickDropContainer = document.getElementById('quick-drop-grid');
+        const regularContainer = document.getElementById('category-grid');
+
+        if (!quickDropContainer || !regularContainer) {
+            console.error('Category grid containers not found!');
             return;
         }
         
-        container.innerHTML = '';
+        quickDropContainer.innerHTML = '';
+        regularContainer.innerHTML = '';
 
         // Category icons mapping
         const categoryIcons = {
@@ -462,8 +548,32 @@ class MappingApp {
             'other': '📍'
         };
 
+        const quickDropCategory = this.config.categories.find(c => c.code === 'immediate_drops');
+        if (quickDropCategory && quickDropCategory.subcategories) {
+            quickDropCategory.subcategories.forEach(subcat => {
+                const quickDropItem = document.createElement('div');
+                quickDropItem.className = 'category-item quick-drop-item';
+                quickDropItem.onclick = () => this.handleQuickDropSelect(quickDropCategory, subcat);
+
+                const icon = document.createElement('div');
+                icon.className = 'category-item-icon';
+                icon.textContent = categoryIcons[subcat.code] || '⚡';
+
+                const label = document.createElement('div');
+                label.className = 'category-item-label';
+                label.textContent = subcat.label;
+
+                quickDropItem.appendChild(icon);
+                quickDropItem.appendChild(label);
+                quickDropContainer.appendChild(quickDropItem);
+            });
+        }
+
+
         console.log('Categories to load:', this.config.categories.length);
         this.config.categories.forEach(category => {
+            if (category.code === 'immediate_drops') return; // Skip the quick drop category itself
+
             const categoryItem = document.createElement('div');
             categoryItem.className = 'category-item';
             categoryItem.onclick = () => this.selectCategory(category);
@@ -478,10 +588,32 @@ class MappingApp {
 
             categoryItem.appendChild(icon);
             categoryItem.appendChild(label);
-            container.appendChild(categoryItem);
+            regularContainer.appendChild(categoryItem);
         });
         
-        console.log('Category grid loaded with', container.children.length, 'items');
+        console.log('Category grid loaded with', regularContainer.children.length, 'items');
+    }
+
+    /**
+     * Handle a quick drop selection
+     * @param {Object} category - The parent "Quick Drops" category
+     * @param {Object} subcategory - The specific quick drop item selected
+     */
+    handleQuickDropSelect(category, subcategory) {
+        this.formData.category = category.code;
+        this.formData.subcategory = subcategory.code;
+
+        this.hideCategoryPopup();
+        this.showSelectedCategory(category);
+        
+        // Hide subcategory dropdown and show the rest of the form
+        document.getElementById('subcategory-section').style.display = 'none';
+        this.showSection('notes-section');
+        this.showSection('tags-section');
+        this.showSection('photos-section');
+        this.showSection('submit-section');
+
+        this.saveDraft();
     }
 
     /**
@@ -489,6 +621,18 @@ class MappingApp {
      * @param {Object} category - Selected category object
      */
     selectCategory(category) {
+        // DIRECT NAVIGATION: If there's only one subcategory, select it automatically.
+        if (category.subcategories && category.subcategories.length === 1) {
+            this.formData.category = category.code;
+            this.formData.subcategory = category.subcategories[0].code;
+
+            this.hideCategoryPopup();
+            this.showSelectedCategory(category);
+            this.onSubcategoryChange(this.formData.subcategory); // Go straight to the form
+            this.saveDraft();
+            return;
+        }
+
         this.formData.category = category.code;
         
         // Hide popup
@@ -634,6 +778,12 @@ class MappingApp {
             this.handleQuickNote();
             return;
         }
+
+        // Handle rapid entry categories
+        if (subcategoryCode === 'price_item' || subcategoryCode === 'pharmacy_stock') {
+            this.buildRapidEntryTable(subcategoryCode);
+            return;
+        }
         
         switch (subcategoryCode) {
             case 'price_item':
@@ -695,6 +845,163 @@ class MappingApp {
         this.showSection('tags-section');
         this.showSection('photos-section');
         this.showSection('submit-section');
+    }
+
+    /**
+     * Builds a table for rapid data entry for price basket and pharmacy stock.
+     * @param {string} type - 'price_item' or 'pharmacy_stock'
+     */
+    buildRapidEntryTable(type) {
+        const container = document.getElementById('dynamic-fields');
+        container.innerHTML = ''; // Clear existing fields
+
+        const items = type === 'price_item' ? this.config.price_items : this.config.meds_availability;
+        const isPriceBasket = type === 'price_item';
+
+        const tableContainer = document.createElement('div');
+        tableContainer.className = 'form-section rapid-entry-container';
+        
+        const table = document.createElement('table');
+        table.className = 'table rapid-entry-table';
+        
+        // Header
+        const thead = document.createElement('thead');
+        thead.innerHTML = isPriceBasket ?
+            `<tr><th>Item</th><th>Price (MVR)</th><th>In Stock?</th><th>Action</th></tr>` :
+            `<tr><th>Medicine</th><th>Availability</th><th>Action</th></tr>`;
+        table.appendChild(thead);
+
+        // Body
+        const tbody = document.createElement('tbody');
+        items.forEach(item => {
+            const row = document.createElement('tr');
+            row.dataset.itemId = isPriceBasket ? item.name : item.name;
+
+            if (isPriceBasket) {
+                row.innerHTML = `
+                    <td>${item.label}</td>
+                    <td><input type="number" class="form-control price-input" placeholder="Price"></td>
+                    <td>
+                        <select class="form-select stock-select">
+                            <option value="">Select...</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </td>
+                    <td><button class="btn btn-sm btn-outline-primary submit-row-btn">Submit</button></td>
+                `;
+            } else { // Pharmacy Stock
+                row.innerHTML = `
+                    <td>${item.label}</td>
+                    <td>
+                        <select class="form-select stock-select">
+                            <option value="">Select...</option>
+                            <option value="in_stock">In Stock</option>
+                            <option value="out_of_stock">Out of Stock</option>
+                            <option value="limited">Limited Stock</option>
+                        </select>
+                    </td>
+                    <td><button class="btn btn-sm btn-outline-primary submit-row-btn">Submit</button></td>
+                `;
+            }
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody);
+        
+        tableContainer.appendChild(table);
+        container.appendChild(tableContainer);
+
+        // Add event listeners to all submit buttons in the table
+        container.querySelectorAll('.submit-row-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleRapidEntrySubmit(e, type));
+        });
+
+        // Show the container
+        this.showSection('dynamic-fields');
+    }
+
+    /**
+     * Handles the submission of a single row in the rapid entry table.
+     * @param {Event} e - The click event
+     * @param {string} type - The type of rapid entry ('price_item' or 'pharmacy_stock')
+     */
+    async handleRapidEntrySubmit(e, type) {
+        const btn = e.target;
+        const row = btn.closest('tr');
+        const itemId = row.dataset.itemId;
+        
+        const rowData = {};
+        let isValid = true;
+
+        if (type === 'price_item') {
+            const priceInput = row.querySelector('.price-input');
+            const stockSelect = row.querySelector('.stock-select');
+            
+            rowData.price_item = itemId;
+            rowData.price_mvr = priceInput.value;
+            rowData.in_stock = stockSelect.value;
+
+            if (!rowData.price_mvr || !rowData.in_stock) {
+                isValid = false;
+            }
+        } else { // pharmacy_stock
+            const stockSelect = row.querySelector('.stock-select');
+            rowData.med_item = itemId;
+            rowData.med_availability = stockSelect.value;
+            if (!rowData.med_availability) {
+                isValid = false;
+            }
+        }
+
+        if (!isValid) {
+            this.showError('Please fill in all fields for this item.');
+            return;
+        }
+
+        // Prepare submission data - merge with base form data
+        const submissionData = {
+            ...this.prepareSubmissionData(), // Gets location, timestamp etc.
+            ...rowData // Adds the item-specific data
+        };
+        
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+
+        try {
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(submissionData));
+
+            const response = await fetch(this.config.endpoint_url, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Success feedback
+            row.classList.add('submit-success');
+            setTimeout(() => row.classList.remove('submit-success'), 1500);
+
+            // Clear inputs
+            row.querySelectorAll('input, select').forEach(input => {
+                if(input.type === 'select-one') {
+                    input.selectedIndex = 0;
+                } else {
+                    input.value = '';
+                }
+            });
+
+        } catch (error) {
+            console.error('Rapid entry submission error:', error);
+            this.showError('Submission failed. Please try again.');
+            row.classList.add('submit-fail');
+            setTimeout(() => row.classList.remove('submit-fail'), 1500);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Submit';
+        }
     }
 
     /**
@@ -1266,62 +1573,61 @@ class MappingApp {
         if (!this.validateForm()) {
             return;
         }
-        
+
         // Show loading overlay
         this.showLoading(true);
-        
+
         try {
             // Prepare submission data
             const submissionData = this.prepareSubmissionData();
-            
-            // Create FormData for multipart upload
-            const formData = new FormData();
-            
-            // Add JSON data
-            formData.append('data', JSON.stringify(submissionData));
-            
-            // Add photos
-            this.formData.photos.forEach((photo, index) => {
-                formData.append(`photo_${index + 1}`, photo);
+
+            // Convert photos to base64
+            const photoPromises = this.formData.photos.map(photo => this.fileToBase64(photo));
+            const photoDataURIs = await Promise.all(photoPromises);
+
+            // Add base64 photo data to the submission object
+            submissionData.photos = photoDataURIs.map(dataUrl => {
+                const parts = dataUrl.split(',');
+                const mimeType = parts[0].match(/:(.*?);/)[1];
+                const base64Data = parts[1];
+                return {
+                    mimeType: mimeType,
+                    data: base64Data
+                };
             });
-            
-            // Submit to endpoint (Google Apps Script or Formspree)
+
+            // Submit to endpoint as a single JSON object
             const response = await fetch(this.config.endpoint_url, {
                 method: 'POST',
-                body: formData
+                // We are sending JSON, so no need for multipart/form-data.
+                // Apps Script handles this content type better.
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
+                },
+                body: JSON.stringify(submissionData)
             });
-            
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorText = await response.text();
+                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
             }
-            
-            // Handle different response formats
-            let result;
-            try {
-                result = await response.json();
-            } catch (e) {
-                // Formspree returns HTML, not JSON
-                if (response.ok) {
-                    result = { success: true };
-                } else {
-                    throw new Error('Submission failed');
-                }
-            }
-            
-            if (result.success || response.ok) {
+
+            const result = await response.json();
+
+            if (result.success) {
                 // Clear draft and show success
                 this.clearDraft();
                 this.showScreen('success-screen');
             } else {
                 throw new Error(result.error || 'Submission failed');
             }
-            
+
         } catch (error) {
             console.error('Submission error:', error);
-            
-            // Try fallback storage
-            const fallbackSuccess = await this.tryFallbackStorage(submissionData);
-            
+
+            // The existing fallback logic is great, let's keep it.
+            const fallbackSuccess = await this.tryFallbackStorage(this.prepareSubmissionData());
+
             if (fallbackSuccess) {
                 this.clearDraft();
                 this.showScreen('success-screen');
@@ -1340,6 +1646,10 @@ class MappingApp {
      */
     async tryFallbackStorage(submissionData) {
         try {
+            // Asynchronously convert all photos to base64
+            const photoPromises = this.formData.photos.map(photo => this.fileToBase64(photo));
+            const photoDataURIs = await Promise.all(photoPromises);
+
             // Store in localStorage as fallback
             const fallbackKey = `mappingApp_fallback_${submissionData.submission_id}`;
             const fallbackData = {
@@ -1349,8 +1659,7 @@ class MappingApp {
                     name: photo.name,
                     size: photo.size,
                     type: photo.type,
-                    // Store as base64 for fallback
-                    data: await this.fileToBase64(photo)
+                    data: photoDataURIs[index] // Use the pre-converted base64 data
                 }))
             };
             
@@ -1586,11 +1895,84 @@ class MappingApp {
         
         this.showScreen('start-screen');
     }
+
+    /**
+     * Create a flattened array of all subcategories for searching
+     */
+    prepareSearchData() {
+        this.allSubcategories = [];
+        this.config.categories.forEach(category => {
+            if (category.subcategories) {
+                category.subcategories.forEach(subcategory => {
+                    this.allSubcategories.push({
+                        ...subcategory,
+                        parentCategory: category
+                    });
+                });
+            }
+        });
+    }
+
+    /**
+     * Filter categories and subcategories based on search input
+     * @param {string} query - The search term
+     */
+    filterCategories(query) {
+        const resultsContainer = document.getElementById('search-results-container');
+        const gridContainer = document.getElementById('category-grid-container');
+
+        if (query.length < 2) {
+            resultsContainer.style.display = 'none';
+            gridContainer.style.display = 'block';
+            resultsContainer.innerHTML = '';
+            return;
+        }
+
+        resultsContainer.style.display = 'block';
+        gridContainer.style.display = 'none';
+        resultsContainer.innerHTML = '';
+
+        const lowerCaseQuery = query.toLowerCase();
+        const results = this.allSubcategories.filter(sub => 
+            sub.label.toLowerCase().includes(lowerCaseQuery)
+        );
+
+        if (results.length === 0) {
+            resultsContainer.innerHTML = '<div class="search-result-item no-results">No matches found</div>';
+        } else {
+            results.forEach(result => {
+                const item = document.createElement('div');
+                item.className = 'search-result-item';
+                item.innerHTML = `
+                    <div class="search-result-label">${result.label}</div>
+                    <div class="search-result-parent">${result.parentCategory.label}</div>
+                `;
+                item.onclick = () => this.handleSearchResultSelect(result.parentCategory, result);
+                resultsContainer.appendChild(item);
+            });
+        }
+    }
+
+    /**
+     * Handle selection from the search results
+     * @param {Object} category - The parent category of the selected item
+     * @param {Object} subcategory - The selected subcategory
+     */
+    handleSearchResultSelect(category, subcategory) {
+        this.formData.category = category.code;
+        this.formData.subcategory = subcategory.code;
+
+        this.hideCategoryPopup();
+        this.showSelectedCategory(category);
+        this.onSubcategoryChange(subcategory.code);
+        this.saveDraft();
+    }
 }
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new MappingApp();
+    const app = new MappingApp();
+    app.init();
 });
 
 // Add CSS for map markers
