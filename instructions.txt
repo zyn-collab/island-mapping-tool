@@ -1,0 +1,259 @@
+**requirements + features schematic** for a **zero-login, mobile-first web data-entry tool** that captures a point on a map with category, notes, photos, and pushes it to a Google Sheet. Keep it simple. No user accounts. No “map of all submissions” in the tool itself. Just capture and send.
+
+# 1) Scope and principles
+
+* **Purpose**: Let anyone open a link on their phone, auto-capture their GPS location (in highest possible detail/precision of coordinates), select a **category/sub-category**, add **notes** and **photos**, and **submit**. Submissions append to a **Google Sheet** (and photos to a Google Drive folder) for later review and mapping.
+* **No accounts, no moderation UI, no analytics, no heavy backend.**
+* **Tone**: Community-centric, encouraging, non-complaint. Friendly copy and icons.
+
+# 2) Core user flow (mobile first)
+
+1. User opens URL → sees **“Start a new entry”** button.
+2. App requests **geolocation**. Show a **map (Leaflet + OSM tiles)** centered on user with a **draggable pin**.
+
+   * Show **lat/long** text above the map and **accuracy** (e.g., “±8 m”).
+   * If GPS fails, allow **manual pin placement** and manual lat/long entry.
+3. User taps **“Confirm location”** → goes to a **single-page form**:
+   * **Category** (required) → shows relevant **sub-category** and fields.
+   * **Optional tags** (multi-select) to add more context.
+   * **Notes** (free text).
+   * **Photos** (1–5). Client-side compress before upload.
+   * **Contact fields** when needed (e.g., for businesses).
+4. User taps **Submit** → brief **success screen** with “Make another entry” and a link to **privacy/consent** info.
+
+# 3) Submission transport
+
+* **Option A (recommended, simplest)**: **Google Apps Script Web App** endpoint
+
+  * Receives a JSON payload and image files (multipart/form-data).
+  * Appends a new row to a **Google Sheet**.
+  * Saves photos to a **Drive folder**; returns public file URLs; writes URLs into the Sheet row.
+* **Option B**: Form endpoints like Formspree or Make.com webhook → Google Sheets. Use only if Apps Script isn’t possible.
+
+# 4) Data model (Google Sheet columns)
+
+One sheet called `submissions` with these columns, fixed order:
+
+* `submission_id` (uuid v4)
+* `submitted_at_iso` (UTC ISO 8601)
+* `app_version`
+* `language` (`en`/`dv`)
+* `lat` (decimal)
+* `lon` (decimal)
+* `gps_accuracy_m` (integer)
+* `category` (enum code)
+* `subcategory` (enum code)
+* `tags` (semicolon-joined codes)
+* `title_or_name` (free text; business name, PSIP site name, etc.)
+* `notes` (free text; max \~1,000 chars)
+* `photo_1_url` … `photo_5_url`
+* `contact_name` (optional, for business/service)
+* `contact_phone`
+* `contact_other`
+* **Category-specific fields** (nullable; leave blank if not used):
+
+  * **Price basket**: `price_item` (repeat handled client-side; see below), `price_mvr`, `in_stock`
+  * **Pharmacy**: `med_item`, `med_availability`, `med_price_mvr`, `insulin_cold_chain`
+  * **Streetlight**: `light_working`, `lux_ground`
+  * **Hazard**: `hazard_type`
+  * **Accessibility**: `access_features` (semicolon codes)
+  * **Internet**: `isp`, `down_mbps`, `up_mbps`, `ping_ms`, `data_price_mvr_gb`
+  * **Water**: `sample_type`, `ph`, `tds_ppm`, `smell`, `color`
+  * **Air/Noise/Heat**: `pm25`, `pm10`, `noise_db`, `temp_c`, `rh`
+  * **PSIP**: `project_type`, `progress_status` (enum), `contractor` (text)
+  * **Transport**: `mode` (ferry/speedboat/cargo), `operator_name`, `days_of_week`, `contact_phone`
+* `submitter_nickname` (optional free text)
+* `consent_confirmed` (`yes`/`no`)
+* `ip_hash` (sha256, client-side hash for basic dedupe; never store raw IP)
+
+**Note on repeats:** To keep Sheets simple, the web form should **submit one item per entry**. For price baskets or pharmacy lists, either:
+
+* Submit separate entries per item, or
+* Limit to **one item** per submission, with a quick “Submit and add another item at same location” button that pre-fills lat/lon and category.
+
+# 5) Category taxonomy (enum codes)
+
+Keep in a JSON config the app loads at runtime. Show friendly labels in UI.
+
+**Top-level `category`**
+
+* `business_service`
+* `public_service`
+* `infrastructure_utility`
+* `transport_travel`
+* `environment_hazard`
+* `health_pharmacy`
+* `price_basket`
+* `accessibility`
+* `plants_trees`
+* `psip_project`
+* `internet_speed`
+* `water_air_soil`
+* `other`
+
+**Key `subcategory` lists (examples; keep short and obvious)**
+
+* `business_service`: `bakery`, `cafe`, `local_eatery`, `fast_food`, `grocery`, `supermarket`, `hardware`, `building_materials`, `mobile_shop`, `it_accessories`, `print_copy`, `pharmacy_shop`, `salon_women`, `barber`, `tailor`, `laundry`, `mechanic`, `bike_moto`, `boat_service`, `stationery_bookshop`, `cosmetics`, `furniture`, `jeweller_watch`, `water_refill`, `gas_supplier`
+* `public_service`: `council_office`, `police_post`, `clinic`, `hospital`, `pharmacy`, `school`, `college`, `library`, `post_courier`, `bank_branch`, `atm`
+* `infrastructure_utility`: `streetlight`, `bin`, `open_drain`, `public_toilet`, `bench`, `shade_tree`, `ramp`, `hydrant`, `siren`, `aed`, `water_refill_point`
+* `transport_travel`: `ferry_jetty`, `speedboat_agent`, `cargo_boat`, `timetable_board`, `seaplane_stop`
+* `environment_hazard`: `dark_area`, `standing_water`, `waste_burning`, `open_manhole`, `trip_hazard`, `stray_dogs`, `flood_spot`
+* `health_pharmacy`: `pharmacy_stock`, `clinic_service`, `health_center_signage`
+* `price_basket`: `rice_5kg`, `flour_5kg`, `cooking_oil_1l`, `sugar_1kg`, `eggs_dozen`, `milk_1l`, `soap_bar`, `diapers_small`, `lpg_13kg_refill`, `water_1_5l`
+* `accessibility`: `council_office_access`, `clinic_access`, `mosque_access`, `school_access`, `public_space_access`
+* `plants_trees`: `shade_tree`, `fruit_tree`, `ornamental`, `mangrove`, `other_plant`
+* `psip_project`: `water_plant`, `sewerage`, `harbor`, `quay_wall`, `road`, `housing`, `school_block`, `clinic_block`, `powerhouse`, `waste_facility`
+* `internet_speed`: `speed_test_point`
+* `water_air_soil`: `water_test_tap`, `water_test_well`, `air_test`, `soil_test`
+* `other`: `other_point`
+
+**`tags`** (optional, multi-select): `women_safety`, `nighttime`, `busy_node`, `school_zone`, `elderly_access`, `kids_zone`, `tourist_area`, `psip_progress_update`, `needs_followup`
+
+# 6) Form fields by category (UI rules)
+
+* Show only the minimal, relevant fields after `subcategory` is picked.
+* Always show **Notes** and **Photos**.
+* Keep forms **2–5 visible fields max** per category.
+
+**Examples**
+
+* **Streetlight**: `light_working` (yes/no), `lux_ground` (number), 1–2 photos.
+* **Hazard**: `hazard_type` (enum), `notes`, photo.
+* **Business**: `title_or_name`, `contact_phone`, `accepts_digital_pay` (yes/no), `wheelchair_access` (yes/no), photo.
+* **Price basket**: `price_item` (enum), `price_mvr` (int), `in_stock` (yes/no), photo (shelf/label).
+* **Pharmacy**: `med_item` (enum), `med_availability` (enum), `med_price_mvr` (int if available), `insulin_cold_chain` (yes/no when insulin), photo.
+* **Internet**: `isp`, `down_mbps`, `up_mbps`, `ping_ms`, `data_price_mvr_gb`.
+* **Water**: `sample_type` (tap/well/bottled), `ph`, `tds_ppm`, `smell` (enum), `color` (enum), photo optional.
+* **PSIP**: `project_type`, `progress_status` (`not_started`, `early`, `mid`, `late`, `completed`), `contractor` (text), photos.
+
+# 7) Map and GPS behavior
+
+* Use **Geolocation API**. Show a pulsing **“You are here”** dot and a **draggable pin**.
+* Display **lat/long** and **accuracy**. Let user tap **“Snap to my GPS”** again if needed.
+* Manual override: search bar to **find place name** or **paste lat,long**.
+* Do not load or draw other users’ points.
+
+# 8) Photos
+
+* Allow **camera** capture or gallery.
+* Client-side **compress** to max width **1600px**, JPEG quality \~0.8.
+* Limit **5 photos** per entry, each under \~2 MB after compression.
+* Upload with the payload; server stores to Drive and returns URLs.
+
+# 9) Offline and drafts (nice-to-have)
+
+* **LocalStorage** draft: if the user closes the tab, reopen to resume.
+* Simple **retry queue** if post fails; user can re-send later.
+* This is optional; if complexity is a concern, skip.
+
+# 10) Validation
+
+* Required: `category`, `subcategory`, `lat`, `lon`, `consent_confirmed`.
+* If `subcategory = price_basket` → require `price_item` and `price_mvr`.
+* If `subcategory = pharmacy_stock` → require `med_item` and `med_availability`.
+* If `subcategory = internet_speed` → require `down_mbps`, `up_mbps`, `ping_ms`.
+* Soft limits: `notes` ≤ 1000 chars; numeric ranges sanity-checked.
+
+# 11) Privacy and consent
+
+* Show a short **consent notice** before first submit:
+
+  * “You’re sharing location coordinates and photos. Don’t upload sensitive personal info or faces of children. Businesses and public spaces only.”
+  * Checkbox: **I agree**.
+* Obscure faces if needed: provide a **“blur faces”** toggle (optional).
+
+# 12) Anti-spam and minimal protection
+
+* **Honeypot** field hidden from real users.
+* **Cloudflare Turnstile** or similar on submit.
+* **ip\_hash** generated client-side for basic dedupe (never store raw IP).
+
+# 13) Admin review workflow (outside this tool)
+
+* All rows land in **Google Sheet**.
+* Set up filters by `category`, `subcategory`, `tags`, date.
+* Photos are stored in a **Drive folder**; each row has `photo_n_url`.
+* You clean text and standardize wording, then export **CSV/GeoJSON** for your real map.
+
+# 14) Look and feel
+
+* **Plain, large buttons**, one column layout, high contrast.
+* Icons for each category.
+* Friendly copy: “Map what’s here,” “Help build your island’s map,” “Celebrate what works, mark what needs care.”
+* Theme color in blues/greens; rounded buttons; minimal text.
+
+# 15) Deployment
+
+* **Static site** (HTML/JS/CSS) on Netlify/Vercel/GitHub Pages.
+* **One Apps Script** web app for the endpoint; store credentials in Script.
+* CORS: allow your domain.
+* If server is down, keep the **“save draft”** and let user re-try later.
+
+# 16) Example JSON payload (what the client posts)
+
+```json
+{
+  "submission_id": "c3c2d9c8-2b9e-4c0c-8b3d-7e8f5a3f9c61",
+  "submitted_at_iso": "2025-09-16T12:34:56Z",
+  "app_version": "1.0.0",
+  "language": "en",
+  "lat": 4.1732,
+  "lon": 73.5089,
+  "gps_accuracy_m": 7,
+  "category": "business_service",
+  "subcategory": "bakery",
+  "tags": "busy_node;women_safety",
+  "title_or_name": "Sunrise Bakery",
+  "notes": "Fresh bread daily, opens 6am. Wheelchair step-free.",
+  "contact_name": "Aishath",
+  "contact_phone": "7xxxxxx",
+  "contact_other": "",
+  "access_features": "step_free",
+  "photo_manifest": ["photo_1.jpg","photo_2.jpg"]
+}
+```
+
+Images are uploaded in the same POST as multipart files. Server renames them (`submission_id__1.jpg`) and returns their public URLs to write into the Sheet.
+
+# 17) Copy blocks you can hand to the designer
+
+* **Start screen title**: “Map what’s here.”
+* **Start button**: “Start a new entry”
+* **Location help**: “We use your GPS to place a pin. Move the pin if needed.”
+* **Confirm location**: “Looks right” / “Recenter on me”
+* **Category prompt**: “What are you mapping?”
+* **Notes placeholder**: “Short description. Keep it factual.”
+* **Photos note**: “Public places and businesses only.”
+* **Submit button**: “Submit”
+* **Success message**: “Thanks. Your entry was sent. Want to add another?”
+* **Consent text**: “By submitting, you share your coordinates and photos. Don’t upload sensitive personal data. This is for community mapping.”
+
+# 18) Minimal settings panel (for you, not users)
+
+* Hosted `config.json` with:
+
+  * `categories` and `subcategories` lists (codes + labels in en/dv).
+  * Allowed `tags`.
+  * Max photo count and size.
+  * Apps Script **endpoint URL**.
+  * Text strings for both languages.
+
+# 19) Non-goals (explicit cuts to keep scope small)
+
+* No accounts or user profiles.
+* No public map or browsing of others’ entries.
+* No editing after submit.
+* No complex moderation UI.
+* No per-island dashboards yet.
+* This is ONLY for labelled data entry, there is no need to be able to view what is logged in the map for the user.
+
+# 20) Acceptance tests (what to verify)
+
+* On a mid-range Android, load time < 3s on 4G.
+* GPS fix within 10 s outdoors; manual pin works indoors.
+* Bakery entry with 2 photos appends to Sheet with correct lat/lon and URLs.
+* Streetlight entry validates “working” and “lux”.
+* Price basket entry enforces price numeric field.
+* Internet test accepts decimals and keeps latency integer.
+* RTL rendering display correctly.
+* If server is offline, user sees a clear error and can retry without data loss (if drafts enabled).

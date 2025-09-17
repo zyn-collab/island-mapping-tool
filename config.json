@@ -1,0 +1,336 @@
+{
+  "categories": [
+    {
+      "code": "business_service",
+      "label": "Businesses & Services",
+      "subcategories": [
+        {"code":"bakery","label":"Bakery"},
+        {"code":"cafe","label":"Cafe"},
+        {"code":"local_eatery","label":"Local eatery"},
+        {"code":"fast_food","label":"Fast-food"},
+        {"code":"grocery","label":"Grocer / corner shop"},
+        {"code":"supermarket","label":"Supermarket / mini-mart"},
+        {"code":"hardware","label":"Hardware / DIY"},
+        {"code":"building_materials","label":"Building materials yard"},
+        {"code":"mobile_shop","label":"Mobile phone shop"},
+        {"code":"it_accessories","label":"Computer / IT accessories"},
+        {"code":"print_copy","label":"Photo / printing / copy"},
+        {"code":"pharmacy_shop","label":"Pharmacy (shopfront)"},
+        {"code":"salon_women","label":"Women's salon"},
+        {"code":"barber","label":"Barber"},
+        {"code":"tailor","label":"Tailor / seamstress"},
+        {"code":"laundry","label":"Laundry / dry clean"},
+        {"code":"mechanic","label":"Mechanic / garage"},
+        {"code":"bike_moto","label":"Bike / motorbike repair"},
+        {"code":"boat_service","label":"Boatyard / outboard service"},
+        {"code":"stationery_bookshop","label":"Stationery / bookshop"},
+        {"code":"cosmetics","label":"Cosmetics / beauty supply"},
+        {"code":"furniture","label":"Furniture"},
+        {"code":"jeweller_watch","label":"Jeweller / watch"},
+        {"code":"water_refill","label":"Water refill"},
+        {"code":"gas_supplier","label":"LPG supplier"}
+      ]
+    },
+    {
+      "code": "public_service",
+      "label": "Public Services",
+      "subcategories": [
+        {"code":"council_office","label":"Council office"},
+        {"code":"police_post","label":"Police post"},
+        {"code":"clinic","label":"Clinic / health post"},
+        {"code":"hospital","label":"Hospital"},
+        {"code":"pharmacy","label":"Pharmacy counter"},
+        {"code":"school","label":"School"},
+        {"code":"college","label":"College / training institute"},
+        {"code":"library","label":"Library"},
+        {"code":"post_courier","label":"Post / courier point"},
+        {"code":"bank_branch","label":"Bank branch"},
+        {"code":"atm","label":"ATM"},
+        {"code":"fire_rescue","label":"Fire & rescue"},
+        {"code":"disaster_shelter","label":"Disaster shelter"}
+      ]
+    },
+    {
+      "code": "social_services",
+      "label": "Social Services",
+      "subcategories": [
+        {"code":"dv_shelter","label":"DV shelter / safe space"},
+        {"code":"family_centre","label":"Family services centre"},
+        {"code":"child_protection","label":"Child protection office"},
+        {"code":"disability_service","label":"Disability service (incl. assistive devices)"},
+        {"code":"elderly_centre","label":"Elder community centre"},
+        {"code":"rehab_centre","label":"Rehab / counseling"},
+        {"code":"reproductive_health","label":"Reproductive health centre"},
+        {"code":"speech_therapy","label":"Speech therapy clinic"}
+      ]
+    },
+    {
+      "code": "infrastructure_utility",
+      "label": "Infrastructure & Utilities",
+      "subcategories": [
+        {"code":"streetlight","label":"Streetlight"},
+        {"code":"bin","label":"Public bin"},
+        {"code":"open_drain","label":"Open drain"},
+        {"code":"public_toilet","label":"Public toilet"},
+        {"code":"bench","label":"Bench"},
+        {"code":"shade_tree_point","label":"Shade tree (point)"},
+        {"code":"ramp","label":"Ramp / step-free entry"},
+        {"code":"tactile_paving","label":"Tactile paving"},
+        {"code":"handrail_stairs","label":"Handrail on stairs"},
+        {"code":"marked_crossing","label":"Marked crossing"},
+        {"code":"hydrant","label":"Fire hydrant / standpipe"},
+        {"code":"siren","label":"Warning siren"},
+        {"code":"aed","label":"AED"},
+        {"code":"water_refill_point","label":"Water refill point"},
+        {"code":"waste_transfer","label":"Waste transfer / recycling"},
+        {"code":"desalination_plant","label":"Desalination plant"},
+        {"code":"water_distribution","label":"Piped water distribution"},
+        {"code":"sewerage_plant","label":"Sewerage plant"},
+        {"code":"powerhouse","label":"Powerhouse"},
+        {"code":"fuel_station","label":"Fuel station / jetty"},
+        {"code":"telecom_tower","label":"Telecom tower"},
+        {"code":"public_wifi","label":"Public Wi-Fi hotspot"},
+        {"code":"fiber_node","label":"Fiber node / cabinet"}
+      ]
+    },
+    {
+      "code": "transport_travel",
+      "label": "Transport & Travel",
+      "subcategories": [
+        {"code":"ferry_jetty","label":"Ferry jetty"},
+        {"code":"ferry_timetable_board","label":"Ferry timetable board"},
+        {"code":"speedboat_agent","label":"Speedboat agent / desk"},
+        {"code":"cargo_boat_operator","label":"Cargo boat operator"},
+        {"code":"cargo_landing_site","label":"Cargo landing site"},
+        {"code":"taxi_stand","label":"Taxi / ride pickup"},
+        {"code":"seaplane_stop","label":"Seaplane stop"},
+        {"code":"vehicle_rental","label":"Vehicle rental"},
+        {"code":"bicycle_rental","label":"Bicycle rental"},
+        {"code":"bike_repair","label":"Bicycle repair"}
+      ]
+    },
+    {
+      "code": "environment_hazard",
+      "label": "Environment & Hazards",
+      "subcategories": [
+        {"code":"dark_area","label":"Dark / unlit area"},
+        {"code":"standing_water","label":"Standing water / mosquitoes"},
+        {"code":"waste_burning","label":"Waste burning spot"},
+        {"code":"open_manhole","label":"Open manhole"},
+        {"code":"trip_hazard","label":"Trip hazard"},
+        {"code":"stray_dogs","label":"Stray dogs hotspot"},
+        {"code":"flood_spot","label":"Flood spot"},
+        {"code":"erosion_hotspot","label":"Erosion hotspot"},
+        {"code":"coastal_dump_site","label":"Coastal dump site"},
+        {"code":"noisy_spot","label":"High-noise spot"},
+        {"code":"heat_hotspot","label":"Heat hotspot (no shade)"}
+      ]
+    },
+    {
+      "code": "price_basket",
+      "label": "Staple Price Basket",
+      "subcategories": [
+        {"code":"price_item","label":"Price item (pick from list)"}
+      ]
+    },
+    {
+      "code": "health_pharmacy",
+      "label": "Pharmacy Stock",
+      "subcategories": [
+        {"code":"pharmacy_stock","label":"Medicine availability (pick item)"}
+      ]
+    },
+    {
+      "code": "health_facility",
+      "label": "Health Facility Scan",
+      "subcategories": [
+        {"code":"clinic_services","label":"Services available (tick list)"},
+        {"code":"emergency_24h","label":"24h emergency presence"},
+        {"code":"posted_hours","label":"Posted clinic hours"}
+      ]
+    },
+    {
+      "code": "accessibility",
+      "label": "Accessibility",
+      "subcategories": [
+        {"code":"council_office_access","label":"Council office access"},
+        {"code":"clinic_access","label":"Clinic access"},
+        {"code":"mosque_access","label":"Mosque access"},
+        {"code":"school_access","label":"School access"},
+        {"code":"public_space_access","label":"Public space access"},
+        {"code":"jetty_access","label":"Jetty / boarding access"}
+      ]
+    },
+    {
+      "code": "plants_trees",
+      "label": "Plants & Trees",
+      "subcategories": [
+        {"code":"shade_tree","label":"Shade tree"},
+        {"code":"fruit_tree","label":"Fruit tree"},
+        {"code":"ornamental","label":"Ornamental"},
+        {"code":"mangrove","label":"Mangrove"},
+        {"code":"coconut","label":"Coconut palm"},
+        {"code":"breadfruit","label":"Breadfruit"},
+        {"code":"banyan","label":"Banyan"},
+        {"code":"other_plant","label":"Other plant"}
+      ]
+    },
+    {
+      "code": "psip_project",
+      "label": "PSIP / Public Works",
+      "subcategories": [
+        {"code":"water_plant","label":"Water plant"},
+        {"code":"sewerage","label":"Sewerage"},
+        {"code":"harbor","label":"Harbor"},
+        {"code":"quay_wall","label":"Quay wall"},
+        {"code":"road","label":"Road"},
+        {"code":"housing","label":"Housing"},
+        {"code":"school_block","label":"School block"},
+        {"code":"clinic_block","label":"Clinic block"},
+        {"code":"powerhouse_block","label":"Powerhouse"},
+        {"code":"waste_facility","label":"Waste facility"},
+        {"code":"coastal_protection","label":"Coastal protection / seawall"},
+        {"code":"park_playground","label":"Park / playground"},
+        {"code":"sports_ground","label":"Sports ground"},
+        {"code":"jetty","label":"Jetty"},
+        {"code":"bridge","label":"Bridge"},
+        {"code":"solar_farm","label":"Solar farm"}
+      ]
+    },
+    {
+      "code": "internet_speed",
+      "label": "Internet Speed",
+      "subcategories": [
+        {"code":"speed_test_point","label":"Speed test point"}
+      ]
+    },
+    {
+      "code": "water_air_soil",
+      "label": "Water / Air / Soil Tests",
+      "subcategories": [
+        {"code":"water_test_tap","label":"Water test — tap"},
+        {"code":"water_test_well","label":"Water test — well"},
+        {"code":"air_test","label":"Air / noise / heat test"},
+        {"code":"soil_test","label":"Soil test"}
+      ]
+    },
+    {
+      "code": "contacts_info",
+      "label": "Contacts & Local Info",
+      "subcategories": [
+        {"code":"speedboat_contact","label":"Speedboat operator contact"},
+        {"code":"ferry_contact","label":"Ferry contact"},
+        {"code":"cargo_contact","label":"Cargo operator contact"},
+        {"code":"council_contact","label":"Council contact"},
+        {"code":"health_center_contact","label":"Health center contact"},
+        {"code":"pharmacy_contact","label":"Pharmacy contact"},
+        {"code":"school_contact","label":"School contact"},
+        {"code":"police_contact","label":"Police contact"},
+        {"code":"utility_contact","label":"Utility contact"},
+        {"code":"common_travel_reasons","label":"Common reasons to travel off-island"},
+        {"code":"population_estimate","label":"Population estimate (local source)"},
+        {"code":"logistics_days","label":"Cargo / delivery days"}
+      ]
+    },
+    {
+      "code": "other",
+      "label": "Other / Notes",
+      "subcategories": [
+        {"code":"other_point","label":"Other point"},
+        {"code":"oral_history","label":"Oral history snippet"}
+      ]
+    }
+  ],
+  "tags": [
+    {"code":"women_safety","label":"Women's safety"},
+    {"code":"nighttime","label":"Nighttime"},
+    {"code":"busy_node","label":"Busy node"},
+    {"code":"school_zone","label":"School zone"},
+    {"code":"elderly_access","label":"Elderly access"},
+    {"code":"kids_zone","label":"Kids zone"},
+    {"code":"tourist_area","label":"Tourist area"},
+    {"code":"psip_progress_update","label":"PSIP progress update"},
+    {"code":"seasonal","label":"Seasonal"},
+    {"code":"temporary","label":"Temporary"},
+    {"code":"under_construction","label":"Under construction"},
+    {"code":"needs_followup","label":"Needs follow-up"},
+    {"code":"verified","label":"Verified"},
+    {"code":"unverified","label":"Unverified"}
+  ],
+  "price_items": [
+    {"name": "rice_5kg", "label": "Rice 5 kg"},
+    {"name": "flour_5kg", "label": "Wheat flour 5 kg"},
+    {"name": "cooking_oil_1l", "label": "Cooking oil 1 L"},
+    {"name": "sugar_1kg", "label": "Sugar 1 kg"},
+    {"name": "uht_milk_1l", "label": "UHT milk 1 L"},
+    {"name": "canned_tuna_185g", "label": "Canned tuna 170–185 g"},
+    {"name": "eggs_dozen", "label": "Eggs 1 dozen"},
+    {"name": "baby_formula_400g", "label": "Baby formula 400 g tin (stage noted)"},
+    {"name": "diapers_small_pack", "label": "Baby diapers small pack (count noted)"},
+    {"name": "bar_soap_100g", "label": "Bar soap 100 g"},
+    {"name": "laundry_powder_1kg", "label": "Laundry powder 1 kg"},
+    {"name": "sanitary_pads_pack", "label": "Sanitary pads 1 pack"},
+    {"name": "bottled_water_1_5l", "label": "Bottled water 1.5 L"},
+    {"name": "ro_refill_20l", "label": "RO refill 20 L (price per jug)"},
+    {"name": "lpg_13kg_refill", "label": "LPG cylinder 13 kg refill"},
+    {"name": "mobile_topup_50", "label": "Mobile top-up MVR 50"}
+  ],
+  "meds_availability": [
+    {"name": "paracetamol", "label": "Paracetamol tabs / pediatric syrup — Panadol, Calpol"},
+    {"name": "ibuprofen", "label": "Ibuprofen tabs / pediatric syrup — Brufen, Advil"},
+    {"name": "cetirizine", "label": "Cetirizine 10 mg — Zyrtec"},
+    {"name": "loratadine", "label": "Loratadine 10 mg — Claritin"},
+    {"name": "ors_zinc", "label": "ORS sachets + Zinc 20 mg (kids) — ORS-L/ORS, Z&D"},
+    {"name": "ondansetron_odt", "label": "Ondansetron ODT 4/8 mg — Zofran"},
+    {"name": "salbutamol_inh", "label": "Salbutamol inhaler 100 mcg — Ventolin"},
+    {"name": "budes_formo", "label": "Budesonide–Formoterol inhaler — Symbicort"},
+    {"name": "fluticasone_ns", "label": "Fluticasone nasal spray — Flixonase"},
+    {"name": "omeprazole", "label": "Omeprazole 20 mg — Omez"},
+    {"name": "pantoprazole", "label": "Pantoprazole 40 mg — Pantocid/Protonix"},
+    {"name": "loperamide", "label": "Loperamide 2 mg — Imodium"},
+    {"name": "lactulose", "label": "Lactulose solution — Duphalac"},
+    {"name": "amlodipine", "label": "Amlodipine 5/10 mg — Norvasc/Amlopres"},
+    {"name": "losartan", "label": "Losartan 50 mg — Cozaar/Losar"},
+    {"name": "telmisartan", "label": "Telmisartan 40 mg — Micardis/Telma"},
+    {"name": "bisoprolol", "label": "Bisoprolol 5 mg — Concor"},
+    {"name": "metoprolol", "label": "Metoprolol 25/50 mg — Betaloc"},
+    {"name": "atorvastatin", "label": "Atorvastatin 10/20 mg — Lipitor/Atorva"},
+    {"name": "rosuvastatin", "label": "Rosuvastatin 10 mg — Crestor/Rosuvas"},
+    {"name": "aspirin_low", "label": "Aspirin 75/81 mg (EC) — Ecosprin"},
+    {"name": "clopidogrel", "label": "Clopidogrel 75 mg — Plavix"},
+    {"name": "furosemide", "label": "Furosemide 40 mg — Lasix"},
+    {"name": "spironolactone", "label": "Spironolactone 25 mg — Aldactone"},
+    {"name": "metformin", "label": "Metformin 500/850/1000 mg — Glucophage"},
+    {"name": "gliclazide_mr", "label": "Gliclazide MR 60 mg — Diamicron"},
+    {"name": "glimepiride", "label": "Glimepiride 2 mg — Amaryl"},
+    {"name": "insulin_regular", "label": "Human insulin (Regular) — Actrapid"},
+    {"name": "insulin_nph", "label": "Human insulin (NPH) — Insulatard"},
+    {"name": "insulin_70_30", "label": "Premix 70/30 — Mixtard 30"},
+    {"name": "insulin_glargine", "label": "Insulin glargine — Lantus/Basaglar"},
+    {"name": "levothyroxine", "label": "Levothyroxine 50/100 mcg — Eltroxin/Thyronorm"},
+    {"name": "amoxicillin", "label": "Amoxicillin 500 mg — Amoxil"},
+    {"name": "amox_clav", "label": "Amoxicillin–Clavulanate 625 mg — Augmentin"},
+    {"name": "azithromycin", "label": "Azithromycin 500 mg — Zithromax/Azithral"},
+    {"name": "cephalexin", "label": "Cephalexin 500 mg — Keflex"},
+    {"name": "cotrim_ds", "label": "Co-trimoxazole DS — Bactrim DS"},
+    {"name": "mupirocin", "label": "Mupirocin 2% ointment — Bactroban"},
+    {"name": "clotrimazole_cream", "label": "Clotrimazole 1% cream — Canesten"},
+    {"name": "fluconazole_150", "label": "Fluconazole 150 mg — Diflucan"},
+    {"name": "hydrocortisone_1", "label": "Hydrocortisone 1% cream — Hytone"},
+    {"name": "diclofenac_gel", "label": "Diclofenac 1% gel — Voltaren/Voveran Emulgel"}
+  ],
+  "psip_status": [
+    {"name":"not_started","label":"Not started"},
+    {"name":"early","label":"Early progress"},
+    {"name":"mid","label":"Mid progress"},
+    {"name":"late","label":"Late progress"},
+    {"name":"completed","label":"Completed"}
+  ],
+  "app_version": "1.0.0",
+  "language": "en",
+  "max_photos": 5,
+  "max_photo_size_mb": 2,
+  "photo_compression_quality": 0.8,
+  "photo_max_width": 1600,
+  "endpoint_url": "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
+}

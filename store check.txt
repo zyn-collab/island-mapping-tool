@@ -1,0 +1,77 @@
+{
+  "choices": {
+    "meds_availability": [
+      { "name": "paracetamol", "label": "Paracetamol tabs / pediatric syrup — Panadol, Calpol" },
+      { "name": "ibuprofen", "label": "Ibuprofen tabs / pediatric syrup — Brufen, Advil" },
+      { "name": "cetirizine", "label": "Cetirizine 10 mg — Zyrtec" },
+      { "name": "loratadine", "label": "Loratadine 10 mg — Claritin" },
+      { "name": "ors_zinc", "label": "ORS sachets + Zinc 20 mg (kids) — ORS-L/ORS, Z&D" },
+      { "name": "ondansetron_odt", "label": "Ondansetron ODT 4/8 mg — Zofran" },
+
+      { "name": "salbutamol_inh", "label": "Salbutamol inhaler 100 mcg — Ventolin" },
+      { "name": "budes_formo", "label": "Budesonide–Formoterol inhaler — Symbicort" },
+      { "name": "fluticasone_ns", "label": "Fluticasone nasal spray — Flixonase" },
+
+      { "name": "omeprazole", "label": "Omeprazole 20 mg — Omez" },
+      { "name": "pantoprazole", "label": "Pantoprazole 40 mg — Pantocid/Protonix" },
+      { "name": "loperamide", "label": "Loperamide 2 mg — Imodium" },
+      { "name": "lactulose", "label": "Lactulose solution — Duphalac" },
+
+      { "name": "amlodipine", "label": "Amlodipine 5/10 mg — Norvasc/Amlopres" },
+      { "name": "losartan", "label": "Losartan 50 mg — Cozaar/Losar" },
+      { "name": "telmisartan", "label": "Telmisartan 40 mg — Micardis/Telma" },
+      { "name": "bisoprolol", "label": "Bisoprolol 5 mg — Concor" },
+      { "name": "metoprolol", "label": "Metoprolol 25/50 mg — Betaloc" },
+      { "name": "atorvastatin", "label": "Atorvastatin 10/20 mg — Lipitor/Atorva" },
+      { "name": "rosuvastatin", "label": "Rosuvastatin 10 mg — Crestor/Rosuvas" },
+      { "name": "aspirin_low", "label": "Aspirin 75/81 mg (EC) — Ecosprin" },
+      { "name": "clopidogrel", "label": "Clopidogrel 75 mg — Plavix" },
+      { "name": "furosemide", "label": "Furosemide 40 mg — Lasix" },
+      { "name": "spironolactone", "label": "Spironolactone 25 mg — Aldactone" },
+
+      { "name": "metformin", "label": "Metformin 500/850/1000 mg — Glucophage" },
+      { "name": "gliclazide_mr", "label": "Gliclazide MR 60 mg — Diamicron" },
+      { "name": "glimepiride", "label": "Glimepiride 2 mg — Amaryl" },
+      { "name": "insulin_regular", "label": "Human insulin (Regular) — Actrapid" },
+      { "name": "insulin_nph", "label": "Human insulin (NPH) — Insulatard" },
+      { "name": "insulin_70_30", "label": "Premix 70/30 — Mixtard 30" },
+      { "name": "insulin_glargine", "label": "Insulin glargine — Lantus/Basaglar" },
+      { "name": "levothyroxine", "label": "Levothyroxine 50/100 mcg — Eltroxin/Thyronorm" },
+
+      { "name": "amoxicillin", "label": "Amoxicillin 500 mg — Amoxil" },
+      { "name": "amox_clav", "label": "Amoxicillin–Clavulanate 625 mg — Augmentin" },
+      { "name": "azithromycin", "label": "Azithromycin 500 mg — Zithromax/Azithral" },
+      { "name": "cephalexin", "label": "Cephalexin 500 mg — Keflex" },
+      { "name": "cotrim_ds", "label": "Co-trimoxazole DS — Bactrim DS" },
+      { "name": "mupirocin", "label": "Mupirocin 2% ointment — Bactroban" },
+      { "name": "clotrimazole_cream", "label": "Clotrimazole 1% cream — Canesten" },
+      { "name": "fluconazole_150", "label": "Fluconazole 150 mg — Diflucan" },
+
+      { "name": "hydrocortisone_1", "label": "Hydrocortisone 1% cream — Hytone" },
+      { "name": "diclofenac_gel", "label": "Diclofenac 1% gel — Voltaren/Voveran Emulgel" }
+    ]
+  }
+}
+
+{
+  "choices": {
+    "price_items": [
+      { "name": "rice_5kg", "label": "Rice 5 kg" },
+      { "name": "flour_5kg", "label": "Wheat flour 5 kg" },
+      { "name": "cooking_oil_1l", "label": "Cooking oil 1 L" },
+      { "name": "sugar_1kg", "label": "Sugar 1 kg" },
+      { "name": "uht_milk_1l", "label": "UHT milk 1 L" },
+      { "name": "canned_tuna_185g", "label": "Canned tuna 170–185 g" },
+      { "name": "eggs_dozen", "label": "Eggs 1 dozen" },
+      { "name": "baby_formula_400g", "label": "Baby formula 400 g tin (stage noted)" },
+      { "name": "diapers_small_pack", "label": "Baby diapers small pack (count noted)" },
+      { "name": "bar_soap_100g", "label": "Bar soap 100 g" },
+      { "name": "laundry_powder_1kg", "label": "Laundry powder 1 kg" },
+      { "name": "sanitary_pads_pack", "label": "Sanitary pads 1 pack" },
+      { "name": "bottled_water_1_5l", "label": "Bottled water 1.5 L" },
+      { "name": "ro_refill_20l", "label": "RO refill 20 L (price per jug)" },
+      { "name": "lpg_13kg_refill", "label": "LPG cylinder 13 kg refill" },
+      { "name": "mobile_topup_50", "label": "Mobile top-up MVR 50" }
+    ]
+  }
+}

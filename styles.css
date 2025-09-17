@@ -1,0 +1,473 @@
+/* Mobile-first responsive styling for the mapping app */
+/* Clean, modern design with soothing blues, greens, teals, and whites */
+
+/* Root variables for consistent theming */
+:root {
+  --primary-color: #2E86AB; /* Soothing blue */
+  --secondary-color: #A23B72; /* Accent color */
+  --success-color: #28A745; /* Green for success */
+  --warning-color: #FFC107; /* Yellow for warnings */
+  --danger-color: #DC3545; /* Red for errors */
+  --light-color: #F8F9FA; /* Light background */
+  --dark-color: #343A40; /* Dark text */
+  --border-radius: 12px; /* Rounded corners */
+  --box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Subtle shadows */
+  --transition: all 0.3s ease; /* Smooth transitions */
+}
+
+/* Base styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--light-color);
+  color: var(--dark-color);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container styles */
+.container-fluid {
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+/* Screen management - only one screen visible at a time */
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.screen.active {
+  display: block;
+}
+
+/* Screen headers */
+.screen-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px 0;
+}
+
+.screen-header h2 {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* App title styling */
+.app-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.app-subtitle {
+  font-size: 1.2rem;
+  color: #6c757d;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+
+/* Button styles */
+.btn {
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  padding: 12px 24px;
+  transition: var(--transition);
+  border: none;
+  box-shadow: var(--box-shadow);
+}
+
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 1.1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), #1e5f7a);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1e5f7a, var(--primary-color));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success-color), #1e7e34);
+  color: white;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #1e7e34, var(--success-color));
+  transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-outline-secondary {
+  border: 2px solid #6c757d;
+  color: #6c757d;
+  background: transparent;
+}
+
+.btn-outline-secondary:hover {
+  background: #6c757d;
+  color: white;
+}
+
+/* Form styles */
+.form-section {
+  margin-bottom: 25px;
+  background: white;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--dark-color);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.form-control, .form-select {
+  border: 2px solid #e9ecef;
+  border-radius: var(--border-radius);
+  padding: 12px 16px;
+  font-size: 1rem;
+  transition: var(--transition);
+  background: white;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(46, 134, 171, 0.25);
+  outline: none;
+}
+
+/* GPS info display */
+.gps-info {
+  background: white;
+  padding: 15px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  box-shadow: var(--box-shadow);
+}
+
+.gps-info small {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.gps-info div {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+}
+
+/* Map container */
+.map-container {
+  height: 300px;
+  width: 100%;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+/* Location controls */
+.location-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.location-controls .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Manual search */
+.manual-search {
+  background: white;
+  padding: 15px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  box-shadow: var(--box-shadow);
+}
+
+.manual-search .form-control {
+  margin-bottom: 10px;
+}
+
+/* Confirm section */
+.confirm-section, .submit-section {
+  text-align: center;
+  margin-top: 30px;
+}
+
+/* Tags container */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tag-checkbox {
+  display: none;
+}
+
+.tag-label {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.tag-checkbox:checked + .tag-label {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* Photo container */
+.photo-container {
+  margin-bottom: 15px;
+}
+
+.photo-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.photo-item {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+.photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-remove {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dynamic fields */
+.dynamic-field {
+  margin-bottom: 15px;
+}
+
+.dynamic-field label {
+  font-weight: 600;
+  color: var(--dark-color);
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-text {
+  margin-top: 15px;
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* Character count */
+.text-muted.small {
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+/* Contact fields */
+#contact-fields {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+}
+
+#contact-fields h5 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* Success screen */
+#success-screen {
+  text-align: center;
+  padding-top: 100px;
+}
+
+#success-screen h2 {
+  color: var(--success-color);
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+#success-screen p {
+  font-size: 1.2rem;
+  color: #6c757d;
+  margin-bottom: 30px;
+}
+
+/* Privacy link */
+#privacy-link {
+  text-decoration: none;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+#privacy-link:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .screen {
+    padding: 40px;
+  }
+  
+  .app-title {
+    font-size: 3rem;
+  }
+  
+  .map-container {
+    height: 400px;
+  }
+  
+  .location-controls {
+    justify-content: center;
+  }
+  
+  .location-controls .btn {
+    flex: none;
+    min-width: 150px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container-fluid {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .screen {
+    padding: 60px;
+  }
+}
+
+/* Accessibility improvements */
+.btn:focus, .form-control:focus, .form-select:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --primary-color: #0066cc;
+    --success-color: #006600;
+    --danger-color: #cc0000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --light-color: #1a1a1a;
+    --dark-color: #ffffff;
+  }
+  
+  body {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  }
+  
+  .screen {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  }
+  
+  .form-section, .gps-info, .manual-search {
+    background: #2d2d2d;
+    border: 1px solid #404040;
+  }
+  
+  .form-control, .form-select {
+    background: #2d2d2d;
+    border-color: #404040;
+    color: white;
+  }
+  
+  .tag-label {
+    background: #404040;
+    border-color: #555;
+    color: white;
+  }
+}
