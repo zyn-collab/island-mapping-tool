@@ -19,11 +19,7 @@ class MappingApp {
             subcategory: '',
             tags: [],
             notes: '',
-            photos: [],
-            contact_name: '',
-            contact_phone: '',
-            contact_other: '',
-            title_or_name: ''
+            photos: []
         };
         
         // Initialize the app when DOM is loaded
@@ -96,11 +92,12 @@ class MappingApp {
             this.confirmLocation();
         });
 
-        // Form screen elements
-        document.getElementById('category-select').addEventListener('change', (e) => {
-            this.onCategoryChange(e.target.value);
+        // Category popup elements
+        document.getElementById('close-popup').addEventListener('click', () => {
+            this.hideCategoryPopup();
         });
 
+        // Form screen elements
         document.getElementById('subcategory-select').addEventListener('change', (e) => {
             this.onSubcategoryChange(e.target.value);
         });
@@ -372,69 +369,162 @@ class MappingApp {
         // Save current state to draft
         this.saveDraft();
         
-        // Move to form screen
+        // Move to form screen and show category popup
         this.showScreen('form-screen');
+        this.showCategoryPopup();
     }
 
     /**
-     * Load form data and populate category dropdowns
+     * Show category selection popup
      */
-    loadFormData() {
-        // Populate category dropdown
-        const categorySelect = document.getElementById('category-select');
-        categorySelect.innerHTML = '<option value="">Select a category...</option>';
-        
+    showCategoryPopup() {
+        const popup = document.getElementById('category-popup');
+        popup.style.display = 'flex';
+        this.loadCategoryGrid();
+    }
+
+    /**
+     * Hide category selection popup
+     */
+    hideCategoryPopup() {
+        document.getElementById('category-popup').style.display = 'none';
+    }
+
+    /**
+     * Load category grid with icons
+     */
+    loadCategoryGrid() {
+        const container = document.getElementById('category-grid');
+        container.innerHTML = '';
+
+        // Category icons mapping
+        const categoryIcons = {
+            'business_service': '🏪',
+            'public_service': '🏛️',
+            'social_services': '🤝',
+            'infrastructure_utility': '🔧',
+            'transport_travel': '🚢',
+            'environment_hazard': '⚠️',
+            'price_basket': '🛒',
+            'health_pharmacy': '💊',
+            'health_facility': '🏥',
+            'accessibility': '♿',
+            'plants_trees': '🌳',
+            'psip_project': '🏗️',
+            'internet_speed': '📶',
+            'water_air_soil': '💧',
+            'contacts_info': '📞',
+            'other': '📍'
+        };
+
         this.config.categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.code;
-            option.textContent = category.label;
-            categorySelect.appendChild(option);
+            const categoryItem = document.createElement('div');
+            categoryItem.className = 'category-item';
+            categoryItem.onclick = () => this.selectCategory(category);
+
+            const icon = document.createElement('div');
+            icon.className = 'category-item-icon';
+            icon.textContent = categoryIcons[category.code] || '📍';
+
+            const label = document.createElement('div');
+            label.className = 'category-item-label';
+            label.textContent = category.label;
+
+            categoryItem.appendChild(icon);
+            categoryItem.appendChild(label);
+            container.appendChild(categoryItem);
         });
-
-        // Clear subcategory dropdown
-        const subcategorySelect = document.getElementById('subcategory-select');
-        subcategorySelect.innerHTML = '<option value="">Select a subcategory...</option>';
-
-        // Load tags
-        this.loadTags();
     }
 
     /**
-     * Handle category selection change
-     * @param {string} categoryCode - Selected category code
+     * Select a category and proceed
+     * @param {Object} category - Selected category object
      */
-    onCategoryChange(categoryCode) {
-        this.formData.category = categoryCode;
+    selectCategory(category) {
+        this.formData.category = category.code;
         
-        // Update subcategory dropdown
-        const subcategorySelect = document.getElementById('subcategory-select');
-        subcategorySelect.innerHTML = '<option value="">Select a subcategory...</option>';
+        // Hide popup
+        this.hideCategoryPopup();
         
-        if (categoryCode) {
-            const category = this.config.categories.find(cat => cat.code === categoryCode);
-            if (category && category.subcategories) {
-                category.subcategories.forEach(subcategory => {
-                    const option = document.createElement('option');
-                    option.value = subcategory.code;
-                    option.textContent = subcategory.label;
-                    subcategorySelect.appendChild(option);
-                });
-            }
-        }
-
-        // Show/hide contact fields for business categories
-        const contactFields = document.getElementById('contact-fields');
-        if (categoryCode === 'business_service' || categoryCode === 'public_service') {
-            contactFields.style.display = 'block';
-        } else {
-            contactFields.style.display = 'none';
-        }
-
-        // Clear dynamic fields
-        this.clearDynamicFields();
+        // Show selected category
+        this.showSelectedCategory(category);
+        
+        // Load subcategories
+        this.loadSubcategories(category);
+        
+        // Show subcategory section
+        this.showSection('subcategory-section');
         
         // Save draft
         this.saveDraft();
+    }
+
+    /**
+     * Show selected category display
+     * @param {Object} category - Selected category
+     */
+    showSelectedCategory(category) {
+        const selectedDiv = document.getElementById('selected-category');
+        const iconEl = document.getElementById('category-icon');
+        const nameEl = document.getElementById('category-name');
+        const descEl = document.getElementById('category-description');
+        
+        // Category icons mapping
+        const categoryIcons = {
+            'business_service': '🏪',
+            'public_service': '🏛️',
+            'social_services': '🤝',
+            'infrastructure_utility': '🔧',
+            'transport_travel': '🚢',
+            'environment_hazard': '⚠️',
+            'price_basket': '🛒',
+            'health_pharmacy': '💊',
+            'health_facility': '🏥',
+            'accessibility': '♿',
+            'plants_trees': '🌳',
+            'psip_project': '🏗️',
+            'internet_speed': '📶',
+            'water_air_soil': '💧',
+            'contacts_info': '📞',
+            'other': '📍'
+        };
+        
+        iconEl.textContent = categoryIcons[category.code] || '📍';
+        nameEl.textContent = category.label;
+        descEl.textContent = 'Tap to change category';
+        
+        selectedDiv.style.display = 'block';
+        
+        // Make it clickable to change category
+        selectedDiv.onclick = () => this.showCategoryPopup();
+    }
+
+    /**
+     * Load subcategories for selected category
+     * @param {Object} category - Selected category
+     */
+    loadSubcategories(category) {
+        const subcategorySelect = document.getElementById('subcategory-select');
+        subcategorySelect.innerHTML = '<option value="">Select...</option>';
+        
+        if (category && category.subcategories) {
+            category.subcategories.forEach(subcategory => {
+                const option = document.createElement('option');
+                option.value = subcategory.code;
+                option.textContent = subcategory.label;
+                subcategorySelect.appendChild(option);
+            });
+        }
+    }
+
+    /**
+     * Show a form section with animation
+     * @param {string} sectionId - ID of section to show
+     */
+    showSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        section.style.display = 'block';
+        section.classList.add('show');
     }
 
     /**
@@ -444,133 +534,16 @@ class MappingApp {
     onSubcategoryChange(subcategoryCode) {
         this.formData.subcategory = subcategoryCode;
         
-        // Generate dynamic fields based on subcategory
-        this.generateDynamicFields(subcategoryCode);
+        // Show remaining sections
+        this.showSection('notes-section');
+        this.showSection('tags-section');
+        this.showSection('photos-section');
+        this.showSection('submit-section');
         
         // Save draft
         this.saveDraft();
     }
 
-    /**
-     * Generate dynamic form fields based on subcategory
-     * @param {string} subcategoryCode - Selected subcategory code
-     */
-    generateDynamicFields(subcategoryCode) {
-        const container = document.getElementById('dynamic-fields');
-        container.innerHTML = '';
-
-        // Add title/name field for most categories
-        if (subcategoryCode && !['price_item', 'pharmacy_stock'].includes(subcategoryCode)) {
-            this.addDynamicField('title_or_name', 'Name/Title', 'text', 'Enter name or title...');
-        }
-
-        // Category-specific fields
-        switch (subcategoryCode) {
-            case 'streetlight':
-                this.addDynamicField('light_working', 'Is the light working?', 'select', '', [
-                    { value: 'yes', label: 'Yes' },
-                    { value: 'no', label: 'No' }
-                ]);
-                this.addDynamicField('lux_ground', 'Ground illumination (lux)', 'number', 'Enter lux reading...');
-                break;
-
-            case 'price_item':
-                this.addDynamicField('price_item', 'Item', 'select', '', this.config.price_items);
-                this.addDynamicField('price_mvr', 'Price (MVR)', 'number', 'Enter price...');
-                this.addDynamicField('in_stock', 'In stock?', 'select', '', [
-                    { value: 'yes', label: 'Yes' },
-                    { value: 'no', label: 'No' }
-                ]);
-                break;
-
-            case 'pharmacy_stock':
-                this.addDynamicField('med_item', 'Medicine', 'select', '', this.config.meds_availability);
-                this.addDynamicField('med_availability', 'Availability', 'select', '', [
-                    { value: 'in_stock', label: 'In stock' },
-                    { value: 'out_of_stock', label: 'Out of stock' },
-                    { value: 'limited', label: 'Limited stock' }
-                ]);
-                this.addDynamicField('med_price_mvr', 'Price (MVR)', 'number', 'Enter price if available...');
-                break;
-
-            case 'internet_speed':
-                this.addDynamicField('isp', 'Internet Service Provider', 'text', 'Enter ISP name...');
-                this.addDynamicField('down_mbps', 'Download speed (Mbps)', 'number', 'Enter download speed...');
-                this.addDynamicField('up_mbps', 'Upload speed (Mbps)', 'number', 'Enter upload speed...');
-                this.addDynamicField('ping_ms', 'Ping (ms)', 'number', 'Enter ping time...');
-                break;
-
-            case 'psip_project':
-                this.addDynamicField('project_type', 'Project Type', 'text', 'Enter project type...');
-                this.addDynamicField('progress_status', 'Progress Status', 'select', '', this.config.psip_status);
-                this.addDynamicField('contractor', 'Contractor', 'text', 'Enter contractor name...');
-                break;
-        }
-    }
-
-    /**
-     * Add a dynamic form field to the form
-     * @param {string} fieldName - Field name/key
-     * @param {string} label - Field label
-     * @param {string} type - Input type (text, number, select, etc.)
-     * @param {string} placeholder - Placeholder text
-     * @param {Array} options - Options for select fields
-     */
-    addDynamicField(fieldName, label, type, placeholder = '', options = []) {
-        const container = document.getElementById('dynamic-fields');
-        
-        const fieldDiv = document.createElement('div');
-        fieldDiv.className = 'dynamic-field form-section';
-        
-        const labelEl = document.createElement('label');
-        labelEl.textContent = label;
-        labelEl.setAttribute('for', fieldName);
-        
-        let inputEl;
-        
-        if (type === 'select') {
-            inputEl = document.createElement('select');
-            inputEl.className = 'form-select';
-            inputEl.id = fieldName;
-            
-            // Add placeholder option
-            const placeholderOption = document.createElement('option');
-            placeholderOption.value = '';
-            placeholderOption.textContent = placeholder || 'Select...';
-            inputEl.appendChild(placeholderOption);
-            
-            // Add options
-            options.forEach(option => {
-                const optionEl = document.createElement('option');
-                optionEl.value = option.value || option.name;
-                optionEl.textContent = option.label;
-                inputEl.appendChild(optionEl);
-            });
-        } else {
-            inputEl = document.createElement('input');
-            inputEl.type = type;
-            inputEl.className = 'form-control';
-            inputEl.id = fieldName;
-            inputEl.placeholder = placeholder;
-        }
-        
-        // Add change event listener to save draft
-        inputEl.addEventListener('change', () => {
-            this.formData[fieldName] = inputEl.value;
-            this.saveDraft();
-        });
-        
-        fieldDiv.appendChild(labelEl);
-        fieldDiv.appendChild(inputEl);
-        container.appendChild(fieldDiv);
-    }
-
-    /**
-     * Clear all dynamic fields
-     */
-    clearDynamicFields() {
-        document.getElementById('dynamic-fields').innerHTML = '';
-    }
 
     /**
      * Load and display available tags
@@ -756,28 +729,6 @@ class MappingApp {
             return false;
         }
         
-        // Category-specific validation
-        if (this.formData.subcategory === 'price_item') {
-            if (!this.formData.price_item || !this.formData.price_mvr) {
-                this.showError('Please fill in all required fields for price basket.');
-                return false;
-            }
-        }
-        
-        if (this.formData.subcategory === 'pharmacy_stock') {
-            if (!this.formData.med_item || !this.formData.med_availability) {
-                this.showError('Please fill in all required fields for pharmacy stock.');
-                return false;
-            }
-        }
-        
-        if (this.formData.subcategory === 'internet_speed') {
-            if (!this.formData.down_mbps || !this.formData.up_mbps || !this.formData.ping_ms) {
-                this.showError('Please fill in all required fields for internet speed test.');
-                return false;
-            }
-        }
-        
         return true;
     }
 
@@ -853,11 +804,7 @@ class MappingApp {
             category: this.formData.category,
             subcategory: this.formData.subcategory,
             tags: this.formData.tags.join(';'),
-            title_or_name: this.formData.title_or_name || '',
             notes: this.formData.notes || '',
-            contact_name: this.formData.contact_name || '',
-            contact_phone: this.formData.contact_phone || '',
-            contact_other: this.formData.contact_other || '',
             consent_confirmed: 'yes', // Assuming user agrees by submitting
             ip_hash: this.generateIPHash() // Simple hash for deduplication
         };
@@ -961,11 +908,7 @@ class MappingApp {
                 subcategory: '',
                 tags: [],
                 notes: '',
-                photos: [],
-                contact_name: '',
-                contact_phone: '',
-                contact_other: '',
-                title_or_name: ''
+                photos: []
             };
         } catch (error) {
             console.error('Failed to clear draft:', error);
@@ -986,18 +929,21 @@ class MappingApp {
             subcategory: '',
             tags: [],
             notes: '',
-            photos: [],
-            contact_name: '',
-            contact_phone: '',
-            contact_other: '',
-            title_or_name: ''
+            photos: []
         };
         
         // Reset form elements
-        document.getElementById('category-select').selectedIndex = 0;
         document.getElementById('subcategory-select').selectedIndex = 0;
         document.getElementById('notes-input').value = '';
         document.getElementById('photo-preview').innerHTML = '';
+        
+        // Hide all sections
+        document.getElementById('selected-category').style.display = 'none';
+        document.getElementById('subcategory-section').style.display = 'none';
+        document.getElementById('notes-section').style.display = 'none';
+        document.getElementById('tags-section').style.display = 'none';
+        document.getElementById('photos-section').style.display = 'none';
+        document.getElementById('submit-section').style.display = 'none';
         
         this.showScreen('start-screen');
     }

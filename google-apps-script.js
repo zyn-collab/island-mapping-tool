@@ -16,7 +16,7 @@ const CONFIG = {
   SHEET_NAME: 'submissions',
   
   // Allowed domains for CORS (update with your domain)
-  ALLOWED_ORIGINS: ['https://yourdomain.com', 'http://localhost:3000']
+  ALLOWED_ORIGINS: ['https://island-mapping-tool.vercel.app/', 'http://island-mapping-tool.vercel.app/', 'http://localhost:3000']
 };
 
 /**

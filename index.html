@@ -68,74 +68,69 @@
             </div>
         </div>
 
+        <!-- Category Selection Popup -->
+        <div id="category-popup" class="category-popup" style="display: none;">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h3>What are you mapping?</h3>
+                    <button id="close-popup" class="close-btn">&times;</button>
+                </div>
+                <div id="category-grid" class="category-grid"></div>
+            </div>
+        </div>
+
         <!-- Form Screen -->
         <div id="form-screen" class="screen">
             <div class="screen-header">
-                <h2>What are you mapping?</h2>
+                <h2 id="selected-category-title">Select Category</h2>
+                <p class="text-muted">Tap the category icon above to get started</p>
             </div>
 
-            <!-- Category Selection -->
-            <div class="form-section">
-                <label for="category-select" class="form-label">Category *</label>
-                <select id="category-select" class="form-select" required>
-                    <option value="">Select a category...</option>
-                </select>
+            <!-- Selected Category Display -->
+            <div id="selected-category" class="selected-category" style="display: none;">
+                <div class="category-display">
+                    <span id="category-icon" class="category-icon">📍</span>
+                    <div class="category-info">
+                        <div id="category-name" class="category-name"></div>
+                        <div id="category-description" class="category-description"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Subcategory Selection -->
-            <div class="form-section">
-                <label for="subcategory-select" class="form-label">Subcategory *</label>
+            <div id="subcategory-section" class="form-section" style="display: none;">
+                <label for="subcategory-select" class="form-label">What specifically?</label>
                 <select id="subcategory-select" class="form-select" required>
-                    <option value="">Select a subcategory...</option>
+                    <option value="">Select...</option>
                 </select>
             </div>
 
-            <!-- Dynamic Fields Container -->
-            <div id="dynamic-fields"></div>
+            <!-- Notes -->
+            <div id="notes-section" class="form-section" style="display: none;">
+                <label for="notes-input" class="form-label">Notes (optional)</label>
+                <textarea id="notes-input" class="form-control" rows="3" placeholder="Add any additional details..." maxlength="500"></textarea>
+                <div class="text-muted small">Characters: <span id="notes-count">0</span>/500</div>
+            </div>
 
             <!-- Tags Selection -->
-            <div class="form-section">
+            <div id="tags-section" class="form-section" style="display: none;">
                 <label class="form-label">Tags (optional)</label>
                 <div id="tags-container" class="tags-container"></div>
             </div>
 
-            <!-- Notes -->
-            <div class="form-section">
-                <label for="notes-input" class="form-label">Notes</label>
-                <textarea id="notes-input" class="form-control" rows="3" placeholder="Short description. Keep it factual." maxlength="1000"></textarea>
-                <div class="text-muted small">Characters: <span id="notes-count">0</span>/1000</div>
-            </div>
-
             <!-- Photos -->
-            <div class="form-section">
+            <div id="photos-section" class="form-section" style="display: none;">
                 <label class="form-label">Photos (optional)</label>
                 <div id="photo-container" class="photo-container">
                     <input type="file" id="photo-input" accept="image/*" multiple style="display: none;">
-                    <button id="add-photo-btn" class="btn btn-outline-primary">Add Photo</button>
+                    <button id="add-photo-btn" class="btn btn-outline-primary">📷 Add Photo</button>
                 </div>
                 <div id="photo-preview" class="photo-preview"></div>
             </div>
 
-            <!-- Contact Fields (shown for business categories) -->
-            <div id="contact-fields" class="form-section" style="display: none;">
-                <h5>Contact Information</h5>
-                <div class="mb-3">
-                    <label for="contact-name" class="form-label">Contact Name</label>
-                    <input type="text" id="contact-name" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label for="contact-phone" class="form-label">Contact Phone</label>
-                    <input type="tel" id="contact-phone" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label for="contact-other" class="form-label">Other Contact Info</label>
-                    <input type="text" id="contact-other" class="form-control">
-                </div>
-            </div>
-
             <!-- Submit Button -->
-            <div class="submit-section">
-                <button id="submit-btn" class="btn btn-success btn-lg">Submit</button>
+            <div id="submit-section" class="submit-section" style="display: none;">
+                <button id="submit-btn" class="btn btn-success btn-lg">Submit Entry</button>
             </div>
         </div>
 
