@@ -26,43 +26,58 @@
         <div id="location-screen" class="screen">
             <div class="screen-header">
                 <button id="back-to-start" class="btn btn-outline-secondary btn-sm">← Back</button>
-                <h2>Confirm your location</h2>
-                <p class="text-muted">We use your GPS to place a pin. Move the pin if needed.</p>
+                <h2 id="location-screen-title">Confirm your location</h2>
+                <p class="text-muted" id="location-screen-subtitle">We use your GPS to place a pin. Move the pin if needed.</p>
             </div>
             
-            <!-- GPS Status and Coordinates Display -->
-            <div id="gps-status" class="gps-info">
-                <div class="row">
-                    <div class="col-6">
-                        <small class="text-muted">Latitude:</small>
-                        <div id="lat-display">--</div>
+            <div id="map-mode-container">
+                <!-- GPS Status and Coordinates Display -->
+                <div id="gps-status" class="gps-info">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Latitude:</small>
+                            <div id="lat-display">--</div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Longitude:</small>
+                            <div id="lon-display">--</div>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <small class="text-muted">Longitude:</small>
-                        <div id="lon-display">--</div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <small class="text-muted">GPS Accuracy:</small>
+                            <div id="accuracy-display">--</div>
+                        </div>
                     </div>
                 </div>
-                <div class="row mt-2">
-                    <div class="col-12">
-                        <small class="text-muted">GPS Accuracy:</small>
-                        <div id="accuracy-display">--</div>
-                    </div>
+
+                <!-- Map Container -->
+                <div id="map" class="map-container"></div>
+
+                <!-- Location Controls -->
+                <div class="location-controls">
+                    <button id="recenter-btn" class="btn btn-outline-primary">Recenter on me</button>
+                    <button id="manual-search-btn" class="btn btn-outline-secondary">Search place</button>
+                </div>
+
+                <!-- Manual Search Input (hidden by default) -->
+                <div id="manual-search" class="manual-search" style="display: none;">
+                    <input type="text" id="search-input" class="form-control" placeholder="Search for a place or enter lat,lon">
+                    <button id="search-btn" class="btn btn-primary">Search</button>
                 </div>
             </div>
 
-            <!-- Map Container -->
-            <div id="map" class="map-container"></div>
-
-            <!-- Location Controls -->
-            <div class="location-controls">
-                <button id="recenter-btn" class="btn btn-outline-primary">Recenter on me</button>
-                <button id="manual-search-btn" class="btn btn-outline-secondary">Search place</button>
+            <div id="island-mode-container" style="display: none;">
+                <div class="form-section">
+                    <label for="island-select" class="form-label">Island Name</label>
+                    <select id="island-select" class="form-control">
+                        <option value="">Loading islands...</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- Manual Search Input (hidden by default) -->
-            <div id="manual-search" class="manual-search" style="display: none;">
-                <input type="text" id="search-input" class="form-control" placeholder="Search for a place or enter lat,lon">
-                <button id="search-btn" class="btn btn-primary">Search</button>
+            <div class="entry-mode-toggle text-center mt-3">
+                <button id="toggle-entry-mode-btn" class="btn btn-link">Or, log for an island by name</button>
             </div>
 
             <!-- Confirm Location Button -->

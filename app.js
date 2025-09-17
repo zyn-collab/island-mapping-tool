@@ -22,9 +22,10 @@ class MappingApp {
             photos: []
         };
         this.allSubcategories = [];
+        this.islandList = [];
+        this.entryMode = 'map'; // 'map' or 'island'
         
-        // Initialize the app when DOM is loaded
-        // this.init();
+        // Defer initialization until DOM is ready
     }
 
     /**
@@ -35,8 +36,12 @@ class MappingApp {
         try {
             console.log('Initializing mapping app...');
             
-            // Load configuration from config.json
-            await this.loadConfig();
+            // Load configuration and island list
+            await Promise.all([
+                this.loadConfig(),
+                this.loadIslandList()
+            ]);
+            
             this.prepareSearchData(); // Create the searchable list of subcategories
             console.log('Config loaded successfully');
             
@@ -72,6 +77,24 @@ class MappingApp {
     }
 
     /**
+     * Load island list from islandlist.txt file
+     */
+    async loadIslandList() {
+        try {
+            const response = await fetch('./islandlist.txt');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const text = await response.text();
+            this.islandList = text.split('\n').map(s => s.trim()).filter(Boolean);
+            console.log('Island list loaded:', this.islandList.length, 'islands');
+        } catch (error) {
+            console.error('Error loading island list:', error);
+            this.islandList = ['Error loading list'];
+        }
+    }
+
+    /**
      * Set up all event listeners for user interactions
      */
     setupEventListeners() {
@@ -82,11 +105,29 @@ class MappingApp {
                 e.preventDefault();
                 console.log('Start button clicked!');
                 this.showScreen('location-screen');
+                this.setEntryMode('map'); // Default to map mode
                 this.requestLocation();
             });
             console.log('Start button event listener added');
         } else {
             console.error('Start button not found!');
+        }
+
+        const manualInitBtn = document.getElementById('manual-init-btn');
+        if (manualInitBtn) {
+            manualInitBtn.addEventListener('click', () => this.init());
+        } else {
+            console.error('Manual init button not found!');
+        }
+
+        const selectIslandBtn = document.getElementById('select-island-btn');
+        if (selectIslandBtn) {
+            selectIslandBtn.addEventListener('click', () => {
+                this.showScreen('island-screen');
+                this.populateIslandList();
+            });
+        } else {
+            console.error('Select island button not found!');
         }
 
         // Location screen buttons
@@ -202,6 +243,17 @@ class MappingApp {
             console.error('Category search input not found!');
         }
 
+        // Mode toggle button
+        const toggleBtn = document.getElementById('toggle-entry-mode-btn');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                const newMode = this.entryMode === 'map' ? 'island' : 'map';
+                this.setEntryMode(newMode);
+            });
+        } else {
+            console.error('Toggle entry mode button not found!');
+        }
+        
         // Navigation buttons
         const backToStartBtn = document.getElementById('back-to-start');
         if (backToStartBtn) {
@@ -476,9 +528,21 @@ class MappingApp {
      * Confirm current location and proceed to form
      */
     confirmLocation() {
-        if (!this.formData.lat || !this.formData.lon) {
-            this.showError('Please select a location first.');
-            return;
+        if (this.entryMode === 'map') {
+            if (!this.formData.lat || !this.formData.lon) {
+                this.showError('Please select a location first.');
+                return;
+            }
+        } else { // island mode
+            const islandSelect = document.getElementById('island-select');
+            const selectedIsland = islandSelect.value;
+            if (!selectedIsland) {
+                this.showError('Please select an island.');
+                return;
+            }
+            this.formData.lat = selectedIsland;
+            this.formData.lon = 'ISLAND_ENTRY';
+            this.formData.gps_accuracy_m = null;
         }
 
         // Save current state to draft
@@ -486,6 +550,35 @@ class MappingApp {
         
         // Move to form screen (popup will show automatically)
         this.showScreen('form-screen');
+    }
+
+    /**
+     * Sets the data entry mode ('map' or 'island') and updates the UI.
+     * @param {string} mode - The mode to switch to.
+     */
+    setEntryMode(mode) {
+        this.entryMode = mode;
+
+        const mapContainer = document.getElementById('map-mode-container');
+        const islandContainer = document.getElementById('island-mode-container');
+        const toggleBtn = document.getElementById('toggle-entry-mode-btn');
+        const title = document.getElementById('location-screen-title');
+        const subtitle = document.getElementById('location-screen-subtitle');
+
+        if (mode === 'island') {
+            mapContainer.style.display = 'none';
+            islandContainer.style.display = 'block';
+            toggleBtn.textContent = 'Use map instead';
+            title.textContent = 'Select an Island';
+            subtitle.textContent = 'Choose the island you are logging data for.';
+            this.populateIslandList();
+        } else { // map mode
+            mapContainer.style.display = 'block';
+            islandContainer.style.display = 'none';
+            toggleBtn.textContent = 'Or, log for an island by name';
+            title.textContent = 'Confirm your location';
+            subtitle.textContent = 'We use your GPS to place a pin. Move the pin if needed.';
+        }
     }
 
     /**
@@ -501,6 +594,23 @@ class MappingApp {
         } else {
             console.error('Category popup element not found!');
         }
+    }
+
+    /**
+     * Populates the island selection dropdown.
+     */
+    populateIslandList() {
+        const islandSelect = document.getElementById('island-select');
+        if (!islandSelect) return;
+
+        islandSelect.innerHTML = '<option value="">Select an island...</option>'; // Clear existing options
+
+        this.islandList.forEach(islandName => {
+            const option = document.createElement('option');
+            option.value = islandName;
+            option.textContent = islandName;
+            islandSelect.appendChild(option);
+        });
     }
 
     /**
@@ -1528,9 +1638,18 @@ class MappingApp {
      */
     validateForm() {
         // Required fields validation
-        if (!this.formData.lat || !this.formData.lon) {
-            this.showError('Please select a location.');
-            return false;
+        if (this.entryMode === 'map') {
+            if (!this.formData.lat || !this.formData.lon) {
+                this.showError('Please select a location.');
+                return false;
+            }
+        } else { // island mode
+            const islandSelect = document.getElementById('island-select');
+            const selectedIsland = islandSelect.value;
+            if (!selectedIsland) {
+                this.showError('Please select an island.');
+                return false;
+            }
         }
         
         if (!this.formData.category) {
