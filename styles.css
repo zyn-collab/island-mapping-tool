@@ -715,6 +715,71 @@ body {
   }
 }
 
+/* Accessibility checklist styles */
+.accessibility-checklist {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: var(--border-radius);
+  padding: 15px;
+  background: #f8f9fa;
+}
+
+.checklist-section {
+  margin-bottom: 20px;
+}
+
+.checklist-section h6 {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.checklist-section label {
+  display: block;
+  margin-bottom: 8px;
+  padding: 5px 10px;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.9rem;
+}
+
+.checklist-section label:hover {
+  background: #e3f2fd;
+}
+
+.checklist-section input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.1);
+}
+
+.checklist-section input[type="checkbox"]:checked + * {
+  color: var(--success-color);
+  font-weight: 500;
+}
+
+/* Navigation button styles */
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  margin-bottom: 10px;
+}
+
+.screen-header {
+  position: relative;
+}
+
+.screen-header .btn-sm {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
 /* Dark mode support - disabled by default for light mode preference */
 /*
 @media (prefers-color-scheme: dark) {

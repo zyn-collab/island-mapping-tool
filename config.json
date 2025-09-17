@@ -28,14 +28,16 @@
         {"code":"furniture","label":"Furniture"},
         {"code":"jeweller_watch","label":"Jeweller / watch"},
         {"code":"water_refill","label":"Water refill"},
-        {"code":"gas_supplier","label":"LPG supplier"}
+        {"code":"gas_supplier","label":"LPG supplier"},
+        {"code":"unspecified","label":"Unspecified business"}
       ]
     },
     {
-      "code": "public_service",
-      "label": "Public Services",
+      "code": "public_community",
+      "label": "Public & Community",
       "subcategories": [
         {"code":"council_office","label":"Council office"},
+        {"code":"government_office","label":"Government office"},
         {"code":"police_post","label":"Police post"},
         {"code":"clinic","label":"Clinic / health post"},
         {"code":"hospital","label":"Hospital"},
@@ -47,7 +49,9 @@
         {"code":"bank_branch","label":"Bank branch"},
         {"code":"atm","label":"ATM"},
         {"code":"fire_rescue","label":"Fire & rescue"},
-        {"code":"disaster_shelter","label":"Disaster shelter"}
+        {"code":"disaster_shelter","label":"Disaster shelter"},
+        {"code":"mosque","label":"Mosque / Islamic centre"},
+        {"code":"unspecified","label":"Unspecified public service"}
       ]
     },
     {
@@ -233,11 +237,37 @@
       ]
     },
     {
+      "code": "immediate_drops",
+      "label": "Quick Drops",
+      "subcategories": [
+        {"code":"motorcycle","label":"Motorcycle"},
+        {"code":"car","label":"Car"},
+        {"code":"broken_vehicle","label":"Broken-down vehicle"},
+        {"code":"road_depression","label":"Road depression"},
+        {"code":"unpaved","label":"Unpaved road"},
+        {"code":"working_streetlight","label":"Working streetlight"},
+        {"code":"broken_streetlight","label":"Broken streetlight"},
+        {"code":"under_construction","label":"Under construction"},
+        {"code":"abandoned_construction","label":"Abandoned construction"},
+        {"code":"rubble","label":"Rubble"},
+        {"code":"vacant_home","label":"Vacant home"},
+        {"code":"flood_zone","label":"Flood zone"}
+      ]
+    },
+    {
+      "code": "accessibility_check",
+      "label": "Accessibility Check",
+      "subcategories": [
+        {"code":"accessibility_audit","label":"Accessibility audit"}
+      ]
+    },
+    {
       "code": "other",
       "label": "Other / Notes",
       "subcategories": [
         {"code":"other_point","label":"Other point"},
-        {"code":"oral_history","label":"Oral history snippet"}
+        {"code":"oral_history","label":"Oral history snippet"},
+        {"code":"quick_note","label":"Quick note (no category)"}
       ]
     }
   ],

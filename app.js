@@ -123,6 +123,15 @@ class MappingApp {
             this.startNewEntry();
         });
 
+        // Navigation buttons
+        document.getElementById('back-to-start').addEventListener('click', () => {
+            this.showScreen('start-screen');
+        });
+
+        document.getElementById('back-to-location').addEventListener('click', () => {
+            this.showScreen('location-screen');
+        });
+
         // Search input enter key
         document.getElementById('search-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -415,7 +424,7 @@ class MappingApp {
         // Category icons mapping
         const categoryIcons = {
             'business_service': '🏪',
-            'public_service': '🏛️',
+            'public_community': '🏛️',
             'social_services': '🤝',
             'infrastructure_utility': '🔧',
             'transport_travel': '🚢',
@@ -429,6 +438,8 @@ class MappingApp {
             'internet_speed': '📶',
             'water_air_soil': '💧',
             'contacts_info': '📞',
+            'immediate_drops': '⚡',
+            'accessibility_check': '♿',
             'other': '📍'
         };
 
@@ -490,7 +501,7 @@ class MappingApp {
         // Category icons mapping
         const categoryIcons = {
             'business_service': '🏪',
-            'public_service': '🏛️',
+            'public_community': '🏛️',
             'social_services': '🤝',
             'infrastructure_utility': '🔧',
             'transport_travel': '🚢',
@@ -504,6 +515,8 @@ class MappingApp {
             'internet_speed': '📶',
             'water_air_soil': '💧',
             'contacts_info': '📞',
+            'immediate_drops': '⚡',
+            'accessibility_check': '♿',
             'other': '📍'
         };
         
@@ -570,8 +583,444 @@ class MappingApp {
         this.showSection('photos-section');
         this.showSection('submit-section');
         
+        // Add category-specific fields for certain subcategories
+        this.addCategorySpecificFields(subcategoryCode);
+        
         // Save draft
         this.saveDraft();
+    }
+
+    /**
+     * Add category-specific fields based on subcategory
+     * @param {string} subcategoryCode - Selected subcategory code
+     */
+    addCategorySpecificFields(subcategoryCode) {
+        // Clear any existing dynamic fields
+        this.clearDynamicFields();
+        
+        // Handle immediate drops - skip subcategory selection
+        if (this.isImmediateDrop(subcategoryCode)) {
+            this.handleImmediateDrop(subcategoryCode);
+            return;
+        }
+        
+        // Handle accessibility check
+        if (subcategoryCode === 'accessibility_audit') {
+            this.addAccessibilityChecklist();
+            return;
+        }
+        
+        // Handle quick note - skip subcategory selection
+        if (subcategoryCode === 'quick_note') {
+            this.handleQuickNote();
+            return;
+        }
+        
+        switch (subcategoryCode) {
+            case 'price_item':
+                this.addPriceBasketFields();
+                break;
+            case 'pharmacy_stock':
+                this.addPharmacyFields();
+                break;
+            case 'internet_speed':
+                this.addInternetSpeedFields();
+                break;
+            case 'streetlight':
+                this.addStreetlightFields();
+                break;
+            case 'psip_project':
+                this.addPSIPFields();
+                break;
+        }
+    }
+
+    /**
+     * Check if subcategory is an immediate drop
+     * @param {string} subcategoryCode - Subcategory code to check
+     * @returns {boolean} - True if immediate drop
+     */
+    isImmediateDrop(subcategoryCode) {
+        const immediateDrops = [
+            'motorcycle', 'car', 'broken_vehicle', 'road_depression', 'unpaved',
+            'working_streetlight', 'broken_streetlight', 'under_construction',
+            'abandoned_construction', 'rubble', 'vacant_home', 'flood_zone'
+        ];
+        return immediateDrops.includes(subcategoryCode);
+    }
+
+    /**
+     * Handle immediate drop - skip to notes/photos
+     * @param {string} subcategoryCode - Immediate drop code
+     */
+    handleImmediateDrop(subcategoryCode) {
+        // Hide subcategory section since we're skipping it
+        document.getElementById('subcategory-section').style.display = 'none';
+        
+        // Show remaining sections immediately
+        this.showSection('notes-section');
+        this.showSection('tags-section');
+        this.showSection('photos-section');
+        this.showSection('submit-section');
+    }
+
+    /**
+     * Handle quick note - skip to notes/photos
+     */
+    handleQuickNote() {
+        // Hide subcategory section since we're skipping it
+        document.getElementById('subcategory-section').style.display = 'none';
+        
+        // Show remaining sections immediately
+        this.showSection('notes-section');
+        this.showSection('tags-section');
+        this.showSection('photos-section');
+        this.showSection('submit-section');
+    }
+
+    /**
+     * Add price basket specific fields
+     */
+    addPriceBasketFields() {
+        const container = document.getElementById('dynamic-fields');
+        
+        // Item selection
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'form-section';
+        itemDiv.innerHTML = `
+            <label for="price-item-select" class="form-label">Select Item *</label>
+            <select id="price-item-select" class="form-select" required>
+                <option value="">Choose an item...</option>
+            </select>
+        `;
+        container.appendChild(itemDiv);
+        
+        // Populate items
+        const select = document.getElementById('price-item-select');
+        this.config.price_items.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.name;
+            option.textContent = item.label;
+            select.appendChild(option);
+        });
+        
+        // Price field
+        const priceDiv = document.createElement('div');
+        priceDiv.className = 'form-section';
+        priceDiv.innerHTML = `
+            <label for="price-mvr" class="form-label">Price (MVR) *</label>
+            <input type="number" id="price-mvr" class="form-control" placeholder="Enter price..." required>
+        `;
+        container.appendChild(priceDiv);
+        
+        // Stock status
+        const stockDiv = document.createElement('div');
+        stockDiv.className = 'form-section';
+        stockDiv.innerHTML = `
+            <label for="in-stock" class="form-label">In Stock? *</label>
+            <select id="in-stock" class="form-select" required>
+                <option value="">Select...</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        `;
+        container.appendChild(stockDiv);
+        
+        // Add event listeners
+        select.addEventListener('change', () => {
+            this.formData.price_item = select.value;
+            this.saveDraft();
+        });
+        
+        document.getElementById('price-mvr').addEventListener('change', (e) => {
+            this.formData.price_mvr = e.target.value;
+            this.saveDraft();
+        });
+        
+        document.getElementById('in-stock').addEventListener('change', (e) => {
+            this.formData.in_stock = e.target.value;
+            this.saveDraft();
+        });
+    }
+
+    /**
+     * Add pharmacy specific fields
+     */
+    addPharmacyFields() {
+        const container = document.getElementById('dynamic-fields');
+        
+        // Medicine selection
+        const medDiv = document.createElement('div');
+        medDiv.className = 'form-section';
+        medDiv.innerHTML = `
+            <label for="med-item-select" class="form-label">Select Medicine *</label>
+            <select id="med-item-select" class="form-select" required>
+                <option value="">Choose a medicine...</option>
+            </select>
+        `;
+        container.appendChild(medDiv);
+        
+        // Populate medicines
+        const select = document.getElementById('med-item-select');
+        this.config.meds_availability.forEach(med => {
+            const option = document.createElement('option');
+            option.value = med.name;
+            option.textContent = med.label;
+            select.appendChild(option);
+        });
+        
+        // Availability status
+        const availDiv = document.createElement('div');
+        availDiv.className = 'form-section';
+        availDiv.innerHTML = `
+            <label for="med-availability" class="form-label">Availability *</label>
+            <select id="med-availability" class="form-select" required>
+                <option value="">Select...</option>
+                <option value="in_stock">In Stock</option>
+                <option value="out_of_stock">Out of Stock</option>
+                <option value="limited">Limited Stock</option>
+            </select>
+        `;
+        container.appendChild(availDiv);
+        
+        // Price field (optional)
+        const priceDiv = document.createElement('div');
+        priceDiv.className = 'form-section';
+        priceDiv.innerHTML = `
+            <label for="med-price-mvr" class="form-label">Price (MVR) - Optional</label>
+            <input type="number" id="med-price-mvr" class="form-control" placeholder="Enter price if available...">
+        `;
+        container.appendChild(priceDiv);
+        
+        // Add event listeners
+        select.addEventListener('change', () => {
+            this.formData.med_item = select.value;
+            this.saveDraft();
+        });
+        
+        document.getElementById('med-availability').addEventListener('change', (e) => {
+            this.formData.med_availability = e.target.value;
+            this.saveDraft();
+        });
+        
+        document.getElementById('med-price-mvr').addEventListener('change', (e) => {
+            this.formData.med_price_mvr = e.target.value;
+            this.saveDraft();
+        });
+    }
+
+    /**
+     * Add internet speed test fields
+     */
+    addInternetSpeedFields() {
+        const container = document.getElementById('dynamic-fields');
+        
+        const fields = [
+            { id: 'isp', label: 'Internet Service Provider', type: 'text', placeholder: 'Enter ISP name...' },
+            { id: 'down-mbps', label: 'Download Speed (Mbps)', type: 'number', placeholder: 'Enter download speed...' },
+            { id: 'up-mbps', label: 'Upload Speed (Mbps)', type: 'number', placeholder: 'Enter upload speed...' },
+            { id: 'ping-ms', label: 'Ping (ms)', type: 'number', placeholder: 'Enter ping time...' }
+        ];
+        
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-section';
+            fieldDiv.innerHTML = `
+                <label for="${field.id}" class="form-label">${field.label} *</label>
+                <input type="${field.type}" id="${field.id}" class="form-control" placeholder="${field.placeholder}" required>
+            `;
+            container.appendChild(fieldDiv);
+            
+            // Add event listener
+            document.getElementById(field.id).addEventListener('change', (e) => {
+                const fieldName = field.id.replace('-', '_');
+                this.formData[fieldName] = e.target.value;
+                this.saveDraft();
+            });
+        });
+    }
+
+    /**
+     * Add streetlight specific fields
+     */
+    addStreetlightFields() {
+        const container = document.getElementById('dynamic-fields');
+        
+        // Working status
+        const workingDiv = document.createElement('div');
+        workingDiv.className = 'form-section';
+        workingDiv.innerHTML = `
+            <label for="light-working" class="form-label">Is the light working? *</label>
+            <select id="light-working" class="form-select" required>
+                <option value="">Select...</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        `;
+        container.appendChild(workingDiv);
+        
+        // Lux reading
+        const luxDiv = document.createElement('div');
+        luxDiv.className = 'form-section';
+        luxDiv.innerHTML = `
+            <label for="lux-ground" class="form-label">Ground Illumination (lux)</label>
+            <input type="number" id="lux-ground" class="form-control" placeholder="Enter lux reading...">
+        `;
+        container.appendChild(luxDiv);
+        
+        // Add event listeners
+        document.getElementById('light-working').addEventListener('change', (e) => {
+            this.formData.light_working = e.target.value;
+            this.saveDraft();
+        });
+        
+        document.getElementById('lux-ground').addEventListener('change', (e) => {
+            this.formData.lux_ground = e.target.value;
+            this.saveDraft();
+        });
+    }
+
+    /**
+     * Add PSIP project specific fields
+     */
+    addPSIPFields() {
+        const container = document.getElementById('dynamic-fields');
+        
+        const fields = [
+            { id: 'project-type', label: 'Project Type', type: 'text', placeholder: 'Enter project type...' },
+            { id: 'progress-status', label: 'Progress Status', type: 'select', options: this.config.psip_status },
+            { id: 'contractor', label: 'Contractor', type: 'text', placeholder: 'Enter contractor name...' }
+        ];
+        
+        fields.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-section';
+            
+            if (field.type === 'select') {
+                fieldDiv.innerHTML = `
+                    <label for="${field.id}" class="form-label">${field.label}</label>
+                    <select id="${field.id}" class="form-select">
+                        <option value="">Select...</option>
+                    </select>
+                `;
+                
+                const select = fieldDiv.querySelector('select');
+                field.options.forEach(option => {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = option.name;
+                    optionEl.textContent = option.label;
+                    select.appendChild(optionEl);
+                });
+            } else {
+                fieldDiv.innerHTML = `
+                    <label for="${field.id}" class="form-label">${field.label}</label>
+                    <input type="${field.type}" id="${field.id}" class="form-control" placeholder="${field.placeholder}">
+                `;
+            }
+            
+            container.appendChild(fieldDiv);
+            
+            // Add event listener
+            const element = document.getElementById(field.id);
+            element.addEventListener('change', (e) => {
+                const fieldName = field.id.replace('-', '_');
+                this.formData[fieldName] = e.target.value;
+                this.saveDraft();
+            });
+        });
+    }
+
+    /**
+     * Add accessibility checklist
+     */
+    addAccessibilityChecklist() {
+        const container = document.getElementById('dynamic-fields');
+        
+        const checklistDiv = document.createElement('div');
+        checklistDiv.className = 'form-section';
+        checklistDiv.innerHTML = `
+            <label class="form-label">Accessibility Checklist</label>
+            <div class="accessibility-checklist">
+                <div class="checklist-section">
+                    <h6>Approach & Paths</h6>
+                    <label><input type="checkbox" data-category="approach"> Step-free route present</label>
+                    <label><input type="checkbox" data-category="approach"> Path clear of obstacles</label>
+                    <label><input type="checkbox" data-category="approach"> Surface firm, non-slip</label>
+                    <label><input type="checkbox" data-category="approach"> Kerb cuts at corners</label>
+                    <label><input type="checkbox" data-category="approach"> Bumpy paving at crossings</label>
+                    <label><input type="checkbox" data-category="approach"> Crossings have audible signal</label>
+                </div>
+                
+                <div class="checklist-section">
+                    <h6>Ramp</h6>
+                    <label><input type="checkbox" data-category="ramp"> Ramp provided where needed</label>
+                    <label><input type="checkbox" data-category="ramp"> Ramp feels gentle slope</label>
+                    <label><input type="checkbox" data-category="ramp"> Ramp surface grips shoes</label>
+                    <label><input type="checkbox" data-category="ramp"> Handrails on both sides</label>
+                    <label><input type="checkbox" data-category="ramp"> Ramp edge kerb present</label>
+                    <label><input type="checkbox" data-category="ramp"> Level landings at ends</label>
+                </div>
+                
+                <div class="checklist-section">
+                    <h6>Entrance</h6>
+                    <label><input type="checkbox" data-category="entrance"> No step at entrance</label>
+                    <label><input type="checkbox" data-category="entrance"> Doorway wide for wheelchair</label>
+                    <label><input type="checkbox" data-category="entrance"> Door opens with light push</label>
+                    <label><input type="checkbox" data-category="entrance"> Automatic door or assistance</label>
+                    <label><input type="checkbox" data-category="entrance"> Doorbell/intercom within reach</label>
+                </div>
+                
+                <div class="checklist-section">
+                    <h6>Toilets</h6>
+                    <label><input type="checkbox" data-category="toilets"> Accessible toilet provided</label>
+                    <label><input type="checkbox" data-category="toilets"> Door easy to open</label>
+                    <label><input type="checkbox" data-category="toilets"> Wheelchair can turn inside</label>
+                    <label><input type="checkbox" data-category="toilets"> Grab bars feel solid</label>
+                    <label><input type="checkbox" data-category="toilets"> Sink, soap within reach</label>
+                    <label><input type="checkbox" data-category="toilets"> Lever-style tap handles</label>
+                </div>
+            </div>
+        `;
+        container.appendChild(checklistDiv);
+        
+        // Add event listeners for checkboxes
+        const checkboxes = checklistDiv.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                this.updateAccessibilityData();
+            });
+        });
+    }
+
+    /**
+     * Update accessibility data from checkboxes
+     */
+    updateAccessibilityData() {
+        const checkboxes = document.querySelectorAll('.accessibility-checklist input[type="checkbox"]');
+        const accessibilityData = {};
+        
+        checkboxes.forEach(checkbox => {
+            const category = checkbox.dataset.category;
+            if (!accessibilityData[category]) {
+                accessibilityData[category] = [];
+            }
+            if (checkbox.checked) {
+                accessibilityData[category].push(checkbox.nextSibling.textContent.trim());
+            }
+        });
+        
+        this.formData.accessibility_features = JSON.stringify(accessibilityData);
+        this.saveDraft();
+    }
+
+    /**
+     * Clear all dynamic fields
+     */
+    clearDynamicFields() {
+        const container = document.getElementById('dynamic-fields');
+        if (container) {
+            container.innerHTML = '';
+        }
     }
 
 
@@ -759,6 +1208,35 @@ class MappingApp {
             return false;
         }
         
+        // Category-specific validation
+        if (this.formData.subcategory === 'price_item') {
+            if (!this.formData.price_item || !this.formData.price_mvr || !this.formData.in_stock) {
+                this.showError('Please fill in all required fields for price basket.');
+                return false;
+            }
+        }
+        
+        if (this.formData.subcategory === 'pharmacy_stock') {
+            if (!this.formData.med_item || !this.formData.med_availability) {
+                this.showError('Please fill in all required fields for pharmacy stock.');
+                return false;
+            }
+        }
+        
+        if (this.formData.subcategory === 'internet_speed') {
+            if (!this.formData.down_mbps || !this.formData.up_mbps || !this.formData.ping_ms) {
+                this.showError('Please fill in all required fields for internet speed test.');
+                return false;
+            }
+        }
+        
+        if (this.formData.subcategory === 'streetlight') {
+            if (!this.formData.light_working) {
+                this.showError('Please indicate if the streetlight is working.');
+                return false;
+            }
+        }
+        
         return true;
     }
 
@@ -810,9 +1288,110 @@ class MappingApp {
             
         } catch (error) {
             console.error('Submission error:', error);
-            this.showError('Failed to submit data. Please try again.');
+            
+            // Try fallback storage
+            const fallbackSuccess = await this.tryFallbackStorage(submissionData);
+            
+            if (fallbackSuccess) {
+                this.clearDraft();
+                this.showScreen('success-screen');
+            } else {
+                this.showError('Failed to submit data. Your entry has been saved locally and will be retried later.');
+            }
         } finally {
             this.showLoading(false);
+        }
+    }
+
+    /**
+     * Try fallback storage when main submission fails
+     * @param {Object} submissionData - Data to store
+     * @returns {boolean} - True if successful
+     */
+    async tryFallbackStorage(submissionData) {
+        try {
+            // Store in localStorage as fallback
+            const fallbackKey = `mappingApp_fallback_${submissionData.submission_id}`;
+            const fallbackData = {
+                ...submissionData,
+                stored_at: new Date().toISOString(),
+                photos: this.formData.photos.map((photo, index) => ({
+                    name: photo.name,
+                    size: photo.size,
+                    type: photo.type,
+                    // Store as base64 for fallback
+                    data: await this.fileToBase64(photo)
+                }))
+            };
+            
+            localStorage.setItem(fallbackKey, JSON.stringify(fallbackData));
+            
+            // Also store in a list of pending submissions
+            const pendingKey = 'mappingApp_pending_submissions';
+            const pending = JSON.parse(localStorage.getItem(pendingKey) || '[]');
+            pending.push(submissionData.submission_id);
+            localStorage.setItem(pendingKey, JSON.stringify(pending));
+            
+            console.log('Data saved to fallback storage:', submissionData.submission_id);
+            return true;
+            
+        } catch (error) {
+            console.error('Fallback storage failed:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Convert file to base64 for storage
+     * @param {File} file - File to convert
+     * @returns {Promise<string>} - Base64 string
+     */
+    fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /**
+     * Retry pending submissions
+     */
+    async retryPendingSubmissions() {
+        const pendingKey = 'mappingApp_pending_submissions';
+        const pending = JSON.parse(localStorage.getItem(pendingKey) || '[]');
+        
+        if (pending.length === 0) return;
+        
+        console.log(`Retrying ${pending.length} pending submissions...`);
+        
+        for (const submissionId of pending) {
+            try {
+                const fallbackKey = `mappingApp_fallback_${submissionId}`;
+                const fallbackData = JSON.parse(localStorage.getItem(fallbackKey));
+                
+                if (fallbackData) {
+                    // Try to resubmit
+                    const formData = new FormData();
+                    formData.append('data', JSON.stringify(fallbackData));
+                    
+                    const response = await fetch(this.config.endpoint_url, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        // Success - remove from pending
+                        localStorage.removeItem(fallbackKey);
+                        const updatedPending = pending.filter(id => id !== submissionId);
+                        localStorage.setItem(pendingKey, JSON.stringify(updatedPending));
+                        console.log(`Successfully resubmitted: ${submissionId}`);
+                    }
+                }
+            } catch (error) {
+                console.error(`Failed to retry submission ${submissionId}:`, error);
+            }
         }
     }
 

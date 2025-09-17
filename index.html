@@ -13,9 +13,11 @@
     <div class="container-fluid">
         <!-- Start Screen -->
         <div id="start-screen" class="screen active">
-            <div class="text-center">
+            <div class="screen-header">
                 <h1 class="app-title">Map what's here</h1>
                 <p class="app-subtitle">Help build your island's map</p>
+            </div>
+            <div class="text-center">
                 <button id="start-btn" class="btn btn-primary btn-lg">Start a new entry</button>
             </div>
         </div>
@@ -23,6 +25,7 @@
         <!-- Location Screen -->
         <div id="location-screen" class="screen">
             <div class="screen-header">
+                <button id="back-to-start" class="btn btn-outline-secondary btn-sm">← Back</button>
                 <h2>Confirm your location</h2>
                 <p class="text-muted">We use your GPS to place a pin. Move the pin if needed.</p>
             </div>
@@ -82,6 +85,7 @@
         <!-- Form Screen -->
         <div id="form-screen" class="screen">
             <div class="screen-header">
+                <button id="back-to-location" class="btn btn-outline-secondary btn-sm">← Back</button>
                 <h2 id="selected-category-title">Select Category</h2>
                 <p class="text-muted">Tap the category icon above to get started</p>
             </div>
@@ -104,6 +108,9 @@
                     <option value="">Select...</option>
                 </select>
             </div>
+
+            <!-- Dynamic Fields Container -->
+            <div id="dynamic-fields"></div>
 
             <!-- Notes -->
             <div id="notes-section" class="form-section" style="display: none;">
