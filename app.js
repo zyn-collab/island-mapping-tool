@@ -147,6 +147,10 @@ class MappingApp {
         // Load form data if showing form screen
         if (screenId === 'form-screen') {
             this.loadFormData();
+            // Show category popup immediately when form screen loads
+            setTimeout(() => {
+                this.showCategoryPopup();
+            }, 100);
         }
     }
 
@@ -369,18 +373,23 @@ class MappingApp {
         // Save current state to draft
         this.saveDraft();
         
-        // Move to form screen and show category popup
+        // Move to form screen (popup will show automatically)
         this.showScreen('form-screen');
-        this.showCategoryPopup();
     }
 
     /**
      * Show category selection popup
      */
     showCategoryPopup() {
+        console.log('Showing category popup...');
         const popup = document.getElementById('category-popup');
-        popup.style.display = 'flex';
-        this.loadCategoryGrid();
+        if (popup) {
+            popup.style.display = 'flex';
+            this.loadCategoryGrid();
+            console.log('Category popup should be visible now');
+        } else {
+            console.error('Category popup element not found!');
+        }
     }
 
     /**
@@ -394,7 +403,13 @@ class MappingApp {
      * Load category grid with icons
      */
     loadCategoryGrid() {
+        console.log('Loading category grid...');
         const container = document.getElementById('category-grid');
+        if (!container) {
+            console.error('Category grid container not found!');
+            return;
+        }
+        
         container.innerHTML = '';
 
         // Category icons mapping
@@ -417,6 +432,7 @@ class MappingApp {
             'other': '📍'
         };
 
+        console.log('Categories to load:', this.config.categories.length);
         this.config.categories.forEach(category => {
             const categoryItem = document.createElement('div');
             categoryItem.className = 'category-item';
@@ -434,6 +450,8 @@ class MappingApp {
             categoryItem.appendChild(label);
             container.appendChild(categoryItem);
         });
+        
+        console.log('Category grid loaded with', container.children.length, 'items');
     }
 
     /**
@@ -525,6 +543,18 @@ class MappingApp {
         const section = document.getElementById(sectionId);
         section.style.display = 'block';
         section.classList.add('show');
+    }
+
+    /**
+     * Load form data and setup form
+     */
+    loadFormData() {
+        // Clear subcategory dropdown
+        const subcategorySelect = document.getElementById('subcategory-select');
+        subcategorySelect.innerHTML = '<option value="">Select...</option>';
+
+        // Load tags
+        this.loadTags();
     }
 
     /**
