@@ -101,22 +101,24 @@ function validateSubmission(data) {
     }
   }
   
-  // Validate coordinates
-  const lat = parseFloat(data.lat);
-  const lon = parseFloat(data.lon);
-  
-  if (isNaN(lat) || lat < -90 || lat > 90) {
-    return {
-      valid: false,
-      error: 'Invalid latitude value'
-    };
-  }
-  
-  if (isNaN(lon) || lon < -180 || lon > 180) {
-    return {
-      valid: false,
-      error: 'Invalid longitude value'
-    };
+  // Validate coordinates only if it's not an island entry
+  if (data.lon !== 'ISLAND_ENTRY') {
+    const lat = parseFloat(data.lat);
+    const lon = parseFloat(data.lon);
+    
+    if (isNaN(lat) || lat < -90 || lat > 90) {
+      return {
+        valid: false,
+        error: 'Invalid latitude value'
+      };
+    }
+    
+    if (isNaN(lon) || lon < -180 || lon > 180) {
+      return {
+        valid: false,
+        error: 'Invalid longitude value'
+      };
+    }
   }
   
   // Validate consent

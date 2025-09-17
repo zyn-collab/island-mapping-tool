@@ -976,6 +976,11 @@ class MappingApp {
 
         const items = type === 'price_item' ? this.config.price_items : this.config.meds_availability;
         const isPriceBasket = type === 'price_item';
+        const formDataType = isPriceBasket ? 'price_basket_data' : 'pharmacy_stock_data';
+
+        if (!this.formData[formDataType]) {
+            this.formData[formDataType] = {};
+        }
 
         const tableContainer = document.createElement('div');
         tableContainer.className = 'form-section rapid-entry-container';
@@ -986,41 +991,43 @@ class MappingApp {
         // Header
         const thead = document.createElement('thead');
         thead.innerHTML = isPriceBasket ?
-            `<tr><th>Item</th><th>Price (MVR)</th><th>In Stock?</th><th>Action</th></tr>` :
-            `<tr><th>Medicine</th><th>Availability</th><th>Action</th></tr>`;
+            `<tr><th>Item</th><th>Price (MVR)</th><th>In Stock?</th></tr>` :
+            `<tr><th>Medicine</th><th>Availability</th></tr>`;
         table.appendChild(thead);
 
         // Body
         const tbody = document.createElement('tbody');
         items.forEach(item => {
             const row = document.createElement('tr');
-            row.dataset.itemId = isPriceBasket ? item.name : item.name;
+            const itemId = isPriceBasket ? item.name : item.name;
+            row.dataset.itemId = itemId;
 
             if (isPriceBasket) {
+                const priceValue = this.formData[formDataType][itemId] ? this.formData[formDataType][itemId].price : '';
+                const stockValue = this.formData[formDataType][itemId] ? this.formData[formDataType][itemId].stock : '';
                 row.innerHTML = `
                     <td>${item.label}</td>
-                    <td><input type="number" class="form-control price-input" placeholder="Price"></td>
+                    <td><input type="number" class="form-control price-input" placeholder="Price" value="${priceValue}"></td>
                     <td>
                         <select class="form-select stock-select">
                             <option value="">Select...</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
+                            <option value="yes" ${stockValue === 'yes' ? 'selected' : ''}>Yes</option>
+                            <option value="no" ${stockValue === 'no' ? 'selected' : ''}>No</option>
                         </select>
                     </td>
-                    <td><button class="btn btn-sm btn-outline-primary submit-row-btn">Submit</button></td>
                 `;
             } else { // Pharmacy Stock
+                const stockValue = this.formData[formDataType][itemId] ? this.formData[formDataType][itemId].stock : '';
                 row.innerHTML = `
                     <td>${item.label}</td>
                     <td>
                         <select class="form-select stock-select">
                             <option value="">Select...</option>
-                            <option value="in_stock">In Stock</option>
-                            <option value="out_of_stock">Out of Stock</option>
-                            <option value="limited">Limited Stock</option>
+                            <option value="in_stock" ${stockValue === 'in_stock' ? 'selected' : ''}>In Stock</option>
+                            <option value="out_of_stock" ${stockValue === 'out_of_stock' ? 'selected' : ''}>Out of Stock</option>
+                            <option value="limited" ${stockValue === 'limited' ? 'selected' : ''}>Limited Stock</option>
                         </select>
                     </td>
-                    <td><button class="btn btn-sm btn-outline-primary submit-row-btn">Submit</button></td>
                 `;
             }
             tbody.appendChild(row);
@@ -1030,9 +1037,9 @@ class MappingApp {
         tableContainer.appendChild(table);
         container.appendChild(tableContainer);
 
-        // Add event listeners to all submit buttons in the table
-        container.querySelectorAll('.submit-row-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.handleRapidEntrySubmit(e, type));
+        // Add event listeners for inputs to save draft
+        container.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', () => this.updateTableFormData(type));
         });
 
         // Show the container
@@ -1040,87 +1047,79 @@ class MappingApp {
     }
 
     /**
-     * Handles the submission of a single row in the rapid entry table.
-     * @param {Event} e - The click event
-     * @param {string} type - The type of rapid entry ('price_item' or 'pharmacy_stock')
+     * Reads the state of the rapid entry table and saves it to formData.
+     * @param {string} type - 'price_item' or 'pharmacy_stock'
      */
-    async handleRapidEntrySubmit(e, type) {
-        const btn = e.target;
-        const row = btn.closest('tr');
-        const itemId = row.dataset.itemId;
+    updateTableFormData(type) {
+        const isPriceBasket = type === 'price_item';
+        const formDataType = isPriceBasket ? 'price_basket_data' : 'pharmacy_stock_data';
         
-        const rowData = {};
-        let isValid = true;
+        if (!this.formData[formDataType]) {
+            this.formData[formDataType] = {};
+        }
 
-        if (type === 'price_item') {
-            const priceInput = row.querySelector('.price-input');
-            const stockSelect = row.querySelector('.stock-select');
+        const table = document.querySelector('.rapid-entry-table');
+        if (!table) return;
+
+        table.querySelectorAll('tbody tr').forEach(row => {
+            const itemId = row.dataset.itemId;
+            if (isPriceBasket) {
+                const priceInput = row.querySelector('.price-input');
+                const stockSelect = row.querySelector('.stock-select');
+                this.formData[formDataType][itemId] = {
+                    price: priceInput.value,
+                    stock: stockSelect.value
+                };
+            } else { // Pharmacy
+                const stockSelect = row.querySelector('.stock-select');
+                this.formData[formDataType][itemId] = {
+                    stock: stockSelect.value
+                };
+            }
+        });
+
+        this.saveDraft();
+    }
+
+    /**
+     * Gets the formatted price basket data string for submission.
+     */
+    getPriceBasketData() {
+        const table = document.querySelector('.rapid-entry-table');
+        if (!table) return '';
+
+        const items = [];
+        table.querySelectorAll('tbody tr').forEach(row => {
+            const itemName = row.cells[0].textContent.trim();
+            const price = row.querySelector('.price-input').value.trim();
+            const stock = row.querySelector('.stock-select').value;
             
-            rowData.price_item = itemId;
-            rowData.price_mvr = priceInput.value;
-            rowData.in_stock = stockSelect.value;
-
-            if (!rowData.price_mvr || !rowData.in_stock) {
-                isValid = false;
+            if (price || stock) { // Only include rows that have been filled
+                items.push(`${itemName}:${price || 'N/A'}:${stock || 'N/A'}`);
             }
-        } else { // pharmacy_stock
-            const stockSelect = row.querySelector('.stock-select');
-            rowData.med_item = itemId;
-            rowData.med_availability = stockSelect.value;
-            if (!rowData.med_availability) {
-                isValid = false;
-            }
-        }
+        });
 
-        if (!isValid) {
-            this.showError('Please fill in all fields for this item.');
-            return;
-        }
+        return items.join('; ');
+    }
 
-        // Prepare submission data - merge with base form data
-        const submissionData = {
-            ...this.prepareSubmissionData(), // Gets location, timestamp etc.
-            ...rowData // Adds the item-specific data
-        };
+    /**
+     * Gets the formatted pharmacy stock data string for submission.
+     */
+    getPharmacyStockData() {
+        const table = document.querySelector('.rapid-entry-table');
+        if (!table) return '';
         
-        btn.disabled = true;
-        btn.textContent = 'Submitting...';
-
-        try {
-            const formData = new FormData();
-            formData.append('data', JSON.stringify(submissionData));
-
-            const response = await fetch(this.config.endpoint_url, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+        const items = [];
+        table.querySelectorAll('tbody tr').forEach(row => {
+            const medName = row.cells[0].textContent.trim();
+            const availability = row.querySelector('.stock-select').value;
+            
+            if (availability) { // Only include rows that have been filled
+                items.push(`${medName}:${availability}`);
             }
+        });
 
-            // Success feedback
-            row.classList.add('submit-success');
-            setTimeout(() => row.classList.remove('submit-success'), 1500);
-
-            // Clear inputs
-            row.querySelectorAll('input, select').forEach(input => {
-                if(input.type === 'select-one') {
-                    input.selectedIndex = 0;
-                } else {
-                    input.value = '';
-                }
-            });
-
-        } catch (error) {
-            console.error('Rapid entry submission error:', error);
-            this.showError('Submission failed. Please try again.');
-            row.classList.add('submit-fail');
-            setTimeout(() => row.classList.remove('submit-fail'), 1500);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Submit';
-        }
+        return items.join('; ');
     }
 
     /**
@@ -1380,82 +1379,94 @@ class MappingApp {
      */
     addAccessibilityChecklist() {
         const container = document.getElementById('dynamic-fields');
-        
+        container.innerHTML = ''; // Clear previous fields
+
+        const checklistItems = {
+            'Approach & Paths': [
+                'Step-free route present', 'Path clear of obstacles', 'Surface firm, non-slip',
+                'Kerb cuts at corners', 'Bumpy paving at crossings', 'Crossings have audible signal'
+            ],
+            'Ramp': [
+                'Ramp provided where needed', 'Ramp feels gentle slope', 'Ramp surface grips shoes',
+                'Handrails on both sides', 'Ramp edge kerb present', 'Level landings at ends'
+            ],
+            'Entrance': [
+                'No step at entrance', 'Doorway wide for wheelchair', 'Door opens with light push',
+                'Automatic door or assistance', 'Doorbell/intercom within reach'
+            ],
+            'Toilets': [
+                'Accessible toilet provided', 'Door easy to open', 'Wheelchair can turn inside',
+                'Grab bars feel solid', 'Sink, soap within reach', 'Lever-style tap handles'
+            ]
+        };
+
         const checklistDiv = document.createElement('div');
         checklistDiv.className = 'form-section';
-        checklistDiv.innerHTML = `
-            <label class="form-label">Accessibility Checklist</label>
-            <div class="accessibility-checklist">
-                <div class="checklist-section">
-                    <h6>Approach & Paths</h6>
-                    <label><input type="checkbox" data-category="approach"> Step-free route present</label>
-                    <label><input type="checkbox" data-category="approach"> Path clear of obstacles</label>
-                    <label><input type="checkbox" data-category="approach"> Surface firm, non-slip</label>
-                    <label><input type="checkbox" data-category="approach"> Kerb cuts at corners</label>
-                    <label><input type="checkbox" data-category="approach"> Bumpy paving at crossings</label>
-                    <label><input type="checkbox" data-category="approach"> Crossings have audible signal</label>
-                </div>
-                
-                <div class="checklist-section">
-                    <h6>Ramp</h6>
-                    <label><input type="checkbox" data-category="ramp"> Ramp provided where needed</label>
-                    <label><input type="checkbox" data-category="ramp"> Ramp feels gentle slope</label>
-                    <label><input type="checkbox" data-category="ramp"> Ramp surface grips shoes</label>
-                    <label><input type="checkbox" data-category="ramp"> Handrails on both sides</label>
-                    <label><input type="checkbox" data-category="ramp"> Ramp edge kerb present</label>
-                    <label><input type="checkbox" data-category="ramp"> Level landings at ends</label>
-                </div>
-                
-                <div class="checklist-section">
-                    <h6>Entrance</h6>
-                    <label><input type="checkbox" data-category="entrance"> No step at entrance</label>
-                    <label><input type="checkbox" data-category="entrance"> Doorway wide for wheelchair</label>
-                    <label><input type="checkbox" data-category="entrance"> Door opens with light push</label>
-                    <label><input type="checkbox" data-category="entrance"> Automatic door or assistance</label>
-                    <label><input type="checkbox" data-category="entrance"> Doorbell/intercom within reach</label>
-                </div>
-                
-                <div class="checklist-section">
-                    <h6>Toilets</h6>
-                    <label><input type="checkbox" data-category="toilets"> Accessible toilet provided</label>
-                    <label><input type="checkbox" data-category="toilets"> Door easy to open</label>
-                    <label><input type="checkbox" data-category="toilets"> Wheelchair can turn inside</label>
-                    <label><input type="checkbox" data-category="toilets"> Grab bars feel solid</label>
-                    <label><input type="checkbox" data-category="toilets"> Sink, soap within reach</label>
-                    <label><input type="checkbox" data-category="toilets"> Lever-style tap handles</label>
-                </div>
-            </div>
-        `;
-        container.appendChild(checklistDiv);
-        
-        // Add event listeners for checkboxes
-        const checkboxes = checklistDiv.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                this.updateAccessibilityData();
+        checklistDiv.innerHTML = `<label class="form-label">Accessibility Checklist</label>`;
+
+        const checklistContainer = document.createElement('div');
+        checklistContainer.className = 'accessibility-checklist';
+
+        for (const sectionTitle in checklistItems) {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'checklist-section';
+            sectionDiv.innerHTML = `<h6>${sectionTitle}</h6>`;
+            
+            checklistItems[sectionTitle].forEach((itemText, index) => {
+                const itemId = `${sectionTitle.replace(/[\s&]/g, '_')}_${index}`;
+                const label = document.createElement('label');
+                label.innerHTML = `<input type="checkbox" data-item-id="${itemId}"> ${itemText}`;
+                sectionDiv.appendChild(label);
             });
+            checklistContainer.appendChild(sectionDiv);
+        }
+
+        checklistDiv.appendChild(checklistContainer);
+        container.appendChild(checklistDiv);
+
+        // Add event listeners and restore state from draft
+        checklistContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => this.updateAccessibilityFormData());
+            const itemId = checkbox.dataset.itemId;
+            if (this.formData.accessibility_checklist_data && this.formData.accessibility_checklist_data[itemId]) {
+                checkbox.checked = true;
+            }
         });
     }
 
     /**
-     * Update accessibility data from checkboxes
+     * Reads the state of the accessibility checklist and saves it to formData.
      */
-    updateAccessibilityData() {
-        const checkboxes = document.querySelectorAll('.accessibility-checklist input[type="checkbox"]');
-        const accessibilityData = {};
-        
-        checkboxes.forEach(checkbox => {
-            const category = checkbox.dataset.category;
-            if (!accessibilityData[category]) {
-                accessibilityData[category] = [];
-            }
-            if (checkbox.checked) {
-                accessibilityData[category].push(checkbox.nextSibling.textContent.trim());
-            }
+    updateAccessibilityFormData() {
+        if (!this.formData.accessibility_checklist_data) {
+            this.formData.accessibility_checklist_data = {};
+        }
+        const checklistContainer = document.querySelector('.accessibility-checklist');
+        if (!checklistContainer) return;
+
+        checklistContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            const itemId = checkbox.dataset.itemId;
+            this.formData.accessibility_checklist_data[itemId] = checkbox.checked;
         });
-        
-        this.formData.accessibility_features = JSON.stringify(accessibilityData);
         this.saveDraft();
+    }
+
+    /**
+     * Gets the formatted accessibility data string for submission.
+     */
+    getAccessibilityData() {
+        const checklistContainer = document.querySelector('.accessibility-checklist');
+        if (!checklistContainer) return '';
+
+        const items = [];
+        checklistContainer.querySelectorAll('label').forEach(label => {
+            const checkbox = label.querySelector('input[type="checkbox"]');
+            const itemText = label.textContent.trim();
+            const value = checkbox.checked ? 'YES' : 'NO';
+            items.push(`${itemText}: ${value}`);
+        });
+
+        return items.join('; ');
     }
 
     /**
@@ -1724,6 +1735,18 @@ class MappingApp {
                 };
             });
 
+            // Prepare rapid entry data
+            let rapidEntryData = '';
+            if (this.formData.subcategory === 'price_item') {
+                rapidEntryData = this.getPriceBasketData();
+            } else if (this.formData.subcategory === 'pharmacy_stock') {
+                rapidEntryData = this.getPharmacyStockData();
+            }
+
+            if (rapidEntryData) {
+                submissionData.rapid_entry_data = rapidEntryData;
+            }
+
             // Submit to endpoint as a single JSON object
             const response = await fetch(this.config.endpoint_url, {
                 method: 'POST',
@@ -1869,6 +1892,16 @@ class MappingApp {
     prepareSubmissionData() {
         const now = new Date();
         
+        // Overwrite subcategory with special data if needed
+        let subcategoryData = this.formData.subcategory;
+        if (this.formData.subcategory === 'accessibility_audit') {
+            subcategoryData = this.getAccessibilityData();
+        } else if (this.formData.subcategory === 'price_item') {
+            subcategoryData = this.getPriceBasketData();
+        } else if (this.formData.subcategory === 'pharmacy_stock') {
+            subcategoryData = this.getPharmacyStockData();
+        }
+
         return {
             submission_id: this.generateUUID(),
             submitted_at_iso: now.toISOString(),
@@ -1878,7 +1911,7 @@ class MappingApp {
             lon: this.formData.lon,
             gps_accuracy_m: this.formData.gps_accuracy_m,
             category: this.formData.category,
-            subcategory: this.formData.subcategory,
+            subcategory: subcategoryData,
             tags: this.formData.tags.join(';'),
             notes: this.formData.notes || '',
             consent_confirmed: 'yes', // Assuming user agrees by submitting
