@@ -600,6 +600,8 @@ class MappingApp {
      * @param {Object} subcategory - The specific quick drop item selected
      */
     handleQuickDropSelect(category, subcategory) {
+        this.clearDynamicFields();
+
         this.formData.category = category.code;
         this.formData.subcategory = subcategory.code;
 
