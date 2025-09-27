@@ -122,7 +122,16 @@
         {"code":"community_center","label":"Community center / hall"},
         {"code":"indoor_sports_hall","label":"Indoor sports hall / gymnasium"},
         {"code":"bbq_area","label":"BBQ area"},
-        {"code":"picnic_area","label":"Picnic area"}
+        {"code":"picnic_area","label":"Picnic area"},
+        {"code":"football_pitch","label":"Football pitch"},
+        {"code":"futsal_court","label":"Futsal court"},
+        {"code":"volleyball_court","label":"Volleyball court"},
+        {"code":"basketball_court","label":"Basketball court"},
+        {"code":"cricket_ground","label":"Cricket ground"},
+        {"code":"outdoor_gym","label":"Outdoor gym"},
+        {"code":"badminton_court","label":"Badminton court"},
+        {"code":"tennis_court","label":"Tennis court"},
+        {"code":"running_track","label":"Running track"}
       ]
     },
     {
