@@ -49,9 +49,6 @@ class MappingApp {
             this.setupEventListeners();
             console.log('Event listeners set up');
             
-            // Load any saved draft from localStorage
-            this.loadDraft();
-            
             console.log('Mapping app initialized successfully');
         } catch (error) {
             console.error('Failed to initialize app:', error);
@@ -170,9 +167,25 @@ class MappingApp {
         // Category popup elements
         const closePopupBtn = document.getElementById('close-popup');
         if (closePopupBtn) {
-            closePopupBtn.addEventListener('click', () => {
-                this.hideCategoryPopup();
-            });
+			closePopupBtn.addEventListener('click', () => {
+				// If user has typed in the popup search, treat the header "×" as a
+				// quick way to clear the search and return to the category grid,
+				// instead of closing the entire popup. This matches the common user
+				// expectation when they want to exit search results.
+				const searchInputEl = document.getElementById('category-search-input');
+				const resultsContainer = document.getElementById('search-results-container');
+				const isShowingResults = resultsContainer && resultsContainer.style.display === 'block';
+				if (searchInputEl && (searchInputEl.value || isShowingResults)) {
+					// Clear search text and restore the default category grid view
+					searchInputEl.value = '';
+					this.filterCategories('');
+					searchInputEl.focus();
+					return; // Do not close the popup in this case
+				}
+
+				// No active search - proceed to close the popup as before
+				this.hideCategoryPopup();
+			});
         } else {
             console.error('Close popup button not found!');
         }
@@ -241,6 +254,31 @@ class MappingApp {
             });
         } else {
             console.error('Category search input not found!');
+        }
+
+        // "Other / Note" quick button in popup header
+        const otherNoteBtn = document.getElementById('other-note-btn');
+        if (otherNoteBtn) {
+            otherNoteBtn.addEventListener('click', () => {
+                // Directly set category and subcategory to bypass extra step
+                this.formData.category = 'other';
+                this.formData.subcategory = 'quick_note';
+                this.hideCategoryPopup();
+                // Show selected category header and relevant sections
+                const otherCategory = this.config.categories.find(c => c.code === 'other');
+                if (otherCategory) {
+                    this.showSelectedCategory(otherCategory);
+                }
+                // Skip subcategory dropdown
+                const subcatSection = document.getElementById('subcategory-section');
+                if (subcatSection) subcatSection.style.display = 'none';
+                // Show notes, tags, photos, submit
+                this.showSection('notes-section');
+                this.showSection('tags-section');
+                this.showSection('photos-section');
+                this.showSection('submit-section');
+                this.saveDraft();
+            });
         }
 
         // Mode toggle button
@@ -932,7 +970,7 @@ class MappingApp {
         const immediateDrops = [
             'motorcycle', 'car', 'broken_vehicle', 'road_depression', 'unpaved',
             'working_streetlight', 'broken_streetlight', 'under_construction',
-            'abandoned_construction', 'rubble', 'vacant_home', 'flood_zone'
+            'abandoned_construction', 'rubble', 'garbage_bin', 'vacant_home', 'flood_zone'
         ];
         return immediateDrops.includes(subcategoryCode);
     }
@@ -1531,22 +1569,17 @@ class MappingApp {
      * @param {FileList} files - Selected files
      */
     handlePhotoUpload(files) {
-        const maxPhotos = this.config.max_photos || 5;
-        const maxSize = (this.config.max_photo_size_mb || 2) * 1024 * 1024; // Convert to bytes
-        
+		const maxPhotos = this.config.max_photos || 5;
+		
         if (this.formData.photos.length + files.length > maxPhotos) {
             this.showError(`Maximum ${maxPhotos} photos allowed.`);
             return;
         }
         
-        Array.from(files).forEach(file => {
-            if (file.size > maxSize) {
-                this.showError(`Photo ${file.name} is too large. Maximum size is ${this.config.max_photo_size_mb}MB.`);
-                return;
-            }
-            
-            this.compressAndAddPhoto(file);
-        });
+		Array.from(files).forEach(file => {
+			// Always attempt compression regardless of original size
+			this.compressAndAddPhoto(file);
+		});
         
         // Clear file input
         document.getElementById('photo-input').value = '';
@@ -1556,44 +1589,118 @@ class MappingApp {
      * Compress and add photo to the form
      * @param {File} file - Photo file to compress
      */
-    compressAndAddPhoto(file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                // Create canvas for compression
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                // Calculate new dimensions
-                const maxWidth = this.config.photo_max_width || 1600;
-                const quality = this.config.photo_compression_quality || 0.8;
-                
-                let { width, height } = img;
-                if (width > maxWidth) {
-                    height = (height * maxWidth) / width;
-                    width = maxWidth;
-                }
-                
-                canvas.width = width;
-                canvas.height = height;
-                
-                // Draw and compress
-                ctx.drawImage(img, 0, 0, width, height);
-                
-                canvas.toBlob((blob) => {
-                    const compressedFile = new File([blob], file.name, {
-                        type: 'image/jpeg',
-                        lastModified: Date.now()
-                    });
-                    
-                    this.addPhotoToForm(compressedFile);
-                }, 'image/jpeg', quality);
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
+	compressAndAddPhoto(file) {
+		// Size target after compression (bytes)
+		const maxSize = (this.config.max_photo_size_mb || 2) * 1024 * 1024;
+		const maxWidth = this.config.photo_max_width || 1600;
+		const quality = this.config.photo_compression_quality || 0.8;
+
+		const reader = new FileReader();
+		reader.onerror = () => {
+			this.handleCompressionFailure(file, 'Could not read file.');
+		};
+		reader.onload = (e) => {
+			const img = new Image();
+			img.onerror = () => {
+				this.handleCompressionFailure(file, 'Could not decode image.');
+			};
+			img.onload = () => {
+				try {
+					const canvas = document.createElement('canvas');
+					const ctx = canvas.getContext('2d');
+					let { width, height } = img;
+					if (width > maxWidth) {
+						height = (height * maxWidth) / width;
+						width = maxWidth;
+					}
+					canvas.width = width;
+					canvas.height = height;
+					ctx.drawImage(img, 0, 0, width, height);
+					canvas.toBlob((blob) => {
+						if (!blob) {
+							this.handleCompressionFailure(file, 'Compression returned no data.');
+							return;
+						}
+						if (blob.size > maxSize) {
+							this.handleCompressionFailure(file, 'Compressed image is still too large.');
+							return;
+						}
+						const compressedFile = new File([blob], file.name, {
+							type: 'image/jpeg',
+							lastModified: Date.now()
+						});
+						this.addPhotoToForm(compressedFile);
+					}, 'image/jpeg', quality);
+				} catch (err) {
+					this.handleCompressionFailure(file, 'Compression failed.');
+				}
+			};
+			img.src = e.target.result;
+		};
+		reader.readAsDataURL(file);
+	}
+
+	/**
+	 * Handle compression failure with simple user choices
+	 */
+	handleCompressionFailure(file, reason) {
+		const uploadOriginal = confirm(`${reason}\n\nWould you like to upload the original file instead? (It may be large)`);
+		if (uploadOriginal) {
+			this.addPhotoToForm(file);
+			return;
+		}
+		const saveLocal = confirm('Would you like to save the image to your device instead?');
+		if (saveLocal) {
+			const suggested = this.getPlannedUploadFilename(file);
+			this.saveFileToDevice(file, suggested);
+			alert(`Saved as: ${suggested}`);
+		}
+	}
+
+	/**
+	 * Create or get a draft submission ID for naming files
+	 */
+	getOrCreateDraftSubmissionId() {
+		try {
+			const KEY = 'mappingAppDraftSubmissionId';
+			let id = localStorage.getItem(KEY);
+			if (!id) {
+				id = this.generateUUID();
+				localStorage.setItem(KEY, id);
+			}
+			return id;
+		} catch (e) {
+			return this.generateUUID();
+		}
+	}
+
+	/**
+	 * Build planned upload filename including ID code
+	 */
+	getPlannedUploadFilename(file) {
+		const draftId = this.getOrCreateDraftSubmissionId();
+		const index = (this.formData.photos && this.formData.photos.length ? this.formData.photos.length : 0) + 1;
+		const ext = (file.name && file.name.includes('.')) ? file.name.substring(file.name.lastIndexOf('.')) : '.jpg';
+		return `${draftId}_photo_${index}${ext}`;
+	}
+
+	/**
+	 * Trigger a client-side download to save the file
+	 */
+	saveFileToDevice(file, filename) {
+		try {
+			const url = URL.createObjectURL(file);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			setTimeout(() => URL.revokeObjectURL(url), 1000);
+		} catch (e) {
+			this.showError('Unable to save file to device.');
+		}
+	}
 
     /**
      * Add compressed photo to the form data and display
@@ -1673,20 +1780,22 @@ class MappingApp {
             return false;
         }
         
-        // Category-specific validation
-        if (this.formData.subcategory === 'price_item') {
-            if (!this.formData.price_item || !this.formData.price_mvr || !this.formData.in_stock) {
-                this.showError('Please fill in all required fields for price basket.');
-                return false;
-            }
-        }
-        
-        if (this.formData.subcategory === 'pharmacy_stock') {
-            if (!this.formData.med_item || !this.formData.med_availability) {
-                this.showError('Please fill in all required fields for pharmacy stock.');
-                return false;
-            }
-        }
+		// Category-specific validation (allow partial rapid entry)
+		if (this.formData.subcategory === 'price_item') {
+			const anyData = this.getPriceBasketData();
+			if (!anyData) {
+				this.showError('Please enter at least one price basket item.');
+				return false;
+			}
+		}
+		
+		if (this.formData.subcategory === 'pharmacy_stock') {
+			const anyData = this.getPharmacyStockData();
+			if (!anyData) {
+				this.showError('Please select availability for at least one medicine.');
+				return false;
+			}
+		}
         
         if (this.formData.subcategory === 'internet_speed') {
             if (!this.formData.down_mbps || !this.formData.up_mbps || !this.formData.ping_ms) {
@@ -2009,6 +2118,7 @@ class MappingApp {
     clearDraft() {
         try {
             localStorage.removeItem('mappingAppDraft');
+			localStorage.removeItem('mappingAppDraftSubmissionId');
             this.formData = {
                 lat: null,
                 lon: null,
@@ -2040,6 +2150,7 @@ class MappingApp {
             notes: '',
             photos: []
         };
+		localStorage.removeItem('mappingAppDraftSubmissionId');
         
         // Reset form elements
         document.getElementById('subcategory-select').selectedIndex = 0;

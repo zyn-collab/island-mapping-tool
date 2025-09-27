@@ -1,212 +1,90 @@
-# Mobile Mapping App
+# Community Mapping Tool
 
-A zero-login, mobile-first web data-entry tool that captures GPS locations with category, notes, photos, and submits them to Google Sheets.
+A simple, zero-login, mobile-first web tool for community-driven data collection. It allows anyone with a link to add a geotagged note with categories, details, and photos to a private map, which feeds directly into a Google Sheet for analysis.
 
-## Features
+## Why have an island mapping tool?
 
-- **Mobile-first design** with clean, modern UI
-- **GPS location capture** with high accuracy
-- **Interactive map** with draggable pin placement
-- **Dynamic forms** based on selected categories
-- **Photo upload** with client-side compression
-- **Offline support** with localStorage drafts
-- **Google Sheets integration** via Apps Script
-- **No user accounts** required
+In many places, especially on small islands or in remote communities, there is a lack of up-to-date, granular data about local services, infrastructure, and economic activity. This information gap makes it difficult for policymakers, entrepreneurs, and community leaders to make informed decisions. This tool is designed to bridge that gap. By making mapping and logging information with exact coordinates easy, it creates a rich dataset that can be used for:
 
-## Quick Start
+* **Business and Economic Planning**: Identify gaps in the market by seeing where essential businesses like bakeries, hardware stores, or pharmacies are missing. Entrepreneurs can use this data to build a business case for a new venture. Government can support potential entrepreneurs or SMEs in making business plans or applying for loans by using this data.
+* **Market Access for Island Businesses:** Most island businesses have no web presence, social media page, or even a Google Maps entry which would let anyone who doesn't come across them physically know to buy from them. With businesses mapped, especially with photos of the establishment and its items/menu/price list, we can make them at minimum a Google Maps entry that shows up on search, and ideally even develop small web pages or profiles with SEO for these businesses.
+* **Public Infrastructure Management**: Pinpoint the exact location of potholes, broken streetlights, open drains, or areas prone to flooding. This produces data points that councils and public works departments can use to prioritize repairs.
+* **Housing Mapping:** Dropping a pin for apartments or social housing with a photo and details of rental in the notes allows for detailed mapping of issues such as the differing rents or housing expenses or land values in islands, or mapping out vacant homes to identify supply availability dynamics due to internal migration and population outflow from islands.
+* **Social Services Mapping**: Compile lists with locations of social services like disability centers, domestic violence shelters, or health clinics, making them more accessible to those in need. Information on these services within islands is hard to find online, so this can be used to create a card for each island with the nearest provider of each key social service along with details. This means that when anyone in the country asks for support and needs a service, we would be able to immediately inform them of all their options. In cases of government-insured healthcare needs, government insurance would be able to suggest service providers closer to their islands if aware of them, saving both the government and individual families the expense and hassle of long trips to the capital.
+* **Enhancing Accessibility**: Log accessibility features like wheelchair ramps, step-free entrances, and accessible toilets, creating a resource that can be used by government bodies to identify and address accessibility needs. This can even be used by councils to request budgets or allocate block grants, supported through nonprofits or CSR, or rolled out within federal government programs.
+* **Public Health Monitoring**: Track pharmacy stock for essential medicines, identify potential mosquito breeding sites (standing water), and monitor the operational hours of clinics.
+* **Affordability Tracking**: Create a "price basket" of staple goods (rice, flour, oil, etc.) by logging prices at different shops, providing a clear picture of the cost of living. In particular, items most needed by families with young children (e.g. diapers, baby formula) provides information on the challenges faced by parents.
+* **PSIP and Project Transparency**: Monitor the progress of Public Sector Investment Programme (PSIP) projects with geotagged photos, ensuring accountability and transparency.
+* **Environmental Monitoring**: Collect hyperlocal data on water quality, air quality, heat, noise, and the locations of important natural features like shade trees.
 
-### 1. Deploy the Frontend
+A key principle is that this is **not a public complaint wall**. It's a shared log of what exists, what works, and what needs attention. The data is private to the project team, who can then clean, analyze, and visualize it to create valuable resources like service maps, heatmaps, and briefing notes.
 
-1. Upload all files (`index.html`, `styles.css`, `app.js`, `config.json`) to a web server
-2. Update the `endpoint_url` in `config.json` with your Google Apps Script URL
+## What can be mapped with this tool?
 
-### 2. Set up Google Apps Script Backend
+The tool is designed for maximum flexibility. A user in the field can map as much or as little as they want, and every single data point is valuable. You can conduct a comprehensive survey of an entire island, focus on just one category (like mapping all the pharmacies), or simply drop a few pins at interesting locations. The tool is useful with just a handful of entries and becomes even more powerful with thousands.
 
-1. Go to [Google Apps Script](https://script.google.com)
-2. Create a new project
-3. Copy the code from `google-apps-script.js`
-4. Update the CONFIG section with your IDs:
-   - `SHEET_ID`: Your Google Sheet ID
-   - `DRIVE_FOLDER_ID`: Google Drive folder for photos
-5. Deploy as a web app with "Anyone" access
-6. Copy the web app URL to your `config.json`
+This flexibility extends to how you add information. You don't need to have structured details for every pin. Simply marking that "a bakery is here" is valuable on its own. If you have more details, you can add the name of the establishment, its opening hours, a contact number, or any other relevant information in the "Notes" section. The goal is to make data entry as fast and easy as possible; the detailed data cleaning and structuring will be handled by the project team from the Google Sheet afterward.
 
-### 3. Create Google Sheet
+Here’s a breakdown of what you can map:
 
-Create a new Google Sheet and note its ID. The script will automatically create the `submissions` sheet with proper headers.
+### Quick Drops
 
-### 4. Set up Google Drive Folder
+These are for very fast, high-frequency mapping. If you want to count every motorcycle on a street or map every single streetlight, these single-tap categories let you do that without filling out any other forms. You can quickly pin things like **working or broken streetlights**, **road depressions**, **potholes**, **rubble**, **broken-down vehicles**, or **vacant homes**.
 
-Create a folder in Google Drive for storing photos and note its ID.
+### Categories
 
-## Configuration
+* **Businesses & Services**: This category helps map the local economy. You can pin every type of commercial activity, from bakeries, cafes, and supermarkets to tailors, mechanics, and hardware stores. This helps identify which services are available on an island and which are missing.
+* **Public & Community**: Use this to map all public-facing services. This includes government buildings like the council office or police post, as well as essential public infrastructure like ATMs, post offices, banks, mosques, and schools.
+* **Social Services**: This category is for mapping critical support systems that are often hard to find, such as disability services, family and child support centers, domestic violence shelters, and counseling or rehab centers.
+* **Infrastructure & Utilities**: This is for the foundational infrastructure of the island. You can map public bins, benches, open drains, public toilets, telecom towers, and water or sewerage plants.
+* **Transport & Travel**: Map the island's transport nodes, including ferry jetties, speedboat agents, cargo landing sites, and taxi stands. This is vital for understanding logistics and connectivity.
+* **Environment & Hazards**: Identify risks and environmental features. This includes public safety issues like dark/unlit areas, standing water (mosquito breeding sites), open manholes, and flood spots, as well as environmental points of interest.
+* **Staple Price Basket**: This is a special category for tracking affordability. You can log the prices of essential goods to understand the cost of living. It focuses particularly on items for parents and families, like baby formula, diapers, rice, flour, and milk.
+* **Pharmacy Stock**: Shortages of common medicines are a frequent problem. This category lets you check for the availability of key medicines, including those crucial for the elderly (e.g., for blood pressure, cholesterol, diabetes) and for children (e.g., paracetamol syrup, ORS).
+* **Health Facility Scan**: This allows for a quick audit of the services available at a local clinic or health center, including its posted hours and whether it has 24-hour emergency services.
+* **Accessibility Check**: A detailed checklist to audit the accessibility of a public place like a council office, clinic, or mosque. It covers features like ramps, step-free entrances, handrails, and accessible toilets.
+* **Plants & Trees**: Map the island's green cover, from important shade trees and fruit trees to mangroves.
+* **PSIP / Public Works**: Track the progress of government infrastructure projects with geotagged photos, from harbor construction and road paving to new housing units or school buildings.
+* **Internet Speed**: Log the results of an internet speed test at any given location.
+* **Water / Air / Soil Tests**: For more technical fieldwork, this category allows you to log data from environmental testing kits.
+* **Contacts & Local Info**: A place to store non-physical but location-relevant information, like contact number for the local ferry, the council office, or notes on local logistics. Saving as many contacts as possible is best, to be able to have sources we can ask to update data later.
 
-### Frontend Config (`config.json`)
+## How It Works: The User's Perspective
 
-```json
-{
-  "app_version": "1.0.0",
-  "language": "en",
-  "max_photos": 5,
-  "max_photo_size_mb": 2,
-  "photo_compression_quality": 0.8,
-  "photo_max_width": 1600,
-  "endpoint_url": "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"
-}
-```
+The tool is designed to be very simple to use, with no login and minimal training required.
 
-### Backend Config (in `google-apps-script.js`)
+1. **Open the Link**: The user opens the app's URL on their mobile device.
+2. **Start an Entry**: They tap a single button to begin.
+3. **Confirm Location**: The app automatically detects their GPS location and displays it on a map. The user can drag the pin to refine the exact spot.
+4. **Choose a Category**: A popup appears with clear icons for different categories (e.g., "Business," "Infrastructure," "Hazard").
+5. **Add Details**: Based on the category, a simple form appears. The user selects a subcategory and fills in a few relevant fields.
+6. **Add Notes and Photos**: The user can add a short, factual note and upload up to five photos (e.g., a picture of a pothole, a shop front, or a price tag).
+7. **Submit**: With a final tap, the entry is sent. The data is securely transmitted to the project's Google Sheet.
 
-```javascript
-const CONFIG = {
-  SHEET_ID: 'YOUR_GOOGLE_SHEET_ID',
-  DRIVE_FOLDER_ID: 'YOUR_DRIVE_FOLDER_ID',
-  SHEET_NAME: 'submissions',
-  ALLOWED_ORIGINS: ['https://yourdomain.com']
-};
-```
+The user never sees other people's entries, ensuring privacy and keeping the interface clean and focused on data submission without creating social media dynamics.
 
-## Data Model
+## Core Features
 
-The app captures the following data structure:
+* **Zero-Login**: Anyone with the link can contribute, maximizing participation.
+* **GPS Location Capture**: High-accuracy location with a user-friendly map interface (drag-and-drop pin).
+* **Photo Uploads**: Users can add up to 5 photos, which are automatically compressed on the client-side to save data and speed up uploads.
+* **Google Sheets & Drive Integration**: Data is stored in a structured way in a Google Sheet, with photos uploaded to a corresponding Google Drive folder.
 
-### Core Fields
-- `submission_id` (UUID v4)
-- `submitted_at_iso` (UTC ISO 8601)
-- `lat`, `lon` (decimal coordinates)
-- `gps_accuracy_m` (integer)
-- `category`, `subcategory` (enum codes)
-- `tags` (semicolon-joined codes)
-- `title_or_name` (free text)
-- `notes` (free text, max 1000 chars)
-- `photo_1_url` to `photo_5_url`
-- `contact_name`, `contact_phone`, `contact_other`
-- `consent_confirmed` (yes/no)
-- `ip_hash` (SHA256 hash for deduplication)
+## Data Model and Admin Workflow
 
-### Category-Specific Fields
-- **Price Basket**: `price_item`, `price_mvr`, `in_stock`
-- **Pharmacy**: `med_item`, `med_availability`, `med_price_mvr`, `insulin_cold_chain`
-- **Streetlight**: `light_working`, `lux_ground`
-- **Internet**: `isp`, `down_mbps`, `up_mbps`, `ping_ms`
-- **PSIP Projects**: `project_type`, `progress_status`, `contractor`
-- And more...
+All data is collected in a structured format in the Google Sheet. The columns are pre-defined and cover a wide range of potential data points, from GPS coordinates and notes to category-specific fields.
 
-## Categories
+### Admin Workflow
 
-The app supports 15 main categories:
+The work of the project team begins after the data is submitted:
 
-1. **Businesses & Services** - Shops, restaurants, services
-2. **Public Services** - Government offices, hospitals, schools
-3. **Social Services** - Shelters, counseling, disability services
-4. **Infrastructure & Utilities** - Streetlights, bins, utilities
-5. **Transport & Travel** - Ferries, speedboats, cargo
-6. **Environment & Hazards** - Dark areas, standing water, hazards
-7. **Staple Price Basket** - Essential goods pricing
-8. **Pharmacy Stock** - Medicine availability
-9. **Health Facility Scan** - Clinic services, hours
-10. **Accessibility** - Access features for public spaces
-11. **Plants & Trees** - Vegetation mapping
-12. **PSIP / Public Works** - Infrastructure projects
-13. **Internet Speed** - Speed test points
-14. **Water / Air / Soil Tests** - Environmental testing
-15. **Contacts & Local Info** - Local contacts and information
-
-## Usage
-
-1. **Open the app** on any mobile device
-2. **Tap "Start a new entry"**
-3. **Allow location access** or manually place pin
-4. **Select category and subcategory**
-5. **Fill in relevant fields** (dynamically shown)
-6. **Add optional tags**
-7. **Write notes** (up to 1000 characters)
-8. **Take photos** (up to 5, compressed automatically)
-9. **Submit** - data goes to Google Sheets
-
-## Technical Details
-
-### Frontend
-- **Vanilla JavaScript** - No frameworks for simplicity
-- **Leaflet.js** - Interactive maps with OpenStreetMap
-- **Bootstrap 5** - Responsive UI components
-- **Canvas API** - Client-side photo compression
-- **Geolocation API** - GPS location capture
-- **localStorage** - Draft saving and offline support
-
-### Backend
-- **Google Apps Script** - Serverless backend
-- **Google Sheets API** - Data storage
-- **Google Drive API** - Photo storage
-- **Multipart form handling** - File upload support
-
-### Security
-- **Client-side IP hashing** - No raw IP storage
-- **Input validation** - Server-side data validation
-- **CORS protection** - Domain whitelisting
-- **File type validation** - Image upload restrictions
-
-## Browser Support
-
-- **Modern mobile browsers** (iOS Safari, Chrome Mobile, Firefox Mobile)
-- **GPS support** required for location features
-- **File API support** for photo uploads
-- **localStorage support** for drafts
-
-## Deployment Options
-
-### Static Hosting
-- **Netlify** - Drag and drop deployment
-- **Vercel** - Git-based deployment
-- **GitHub Pages** - Free hosting
-- **Any web server** - Upload files directly
-
-### Custom Domain
-Update the `ALLOWED_ORIGINS` in the Apps Script to include your domain.
-
-## Troubleshooting
-
-### Common Issues
-
-1. **GPS not working**
-   - Check browser permissions
-   - Try manual location entry
-   - Ensure HTTPS (required for GPS)
-
-2. **Photos not uploading**
-   - Check file size limits
-   - Verify Drive folder permissions
-   - Check Apps Script quotas
-
-3. **Data not saving to Sheets**
-   - Verify Sheet ID and permissions
-   - Check Apps Script execution logs
-   - Ensure proper deployment settings
-
-### Testing
-
-Run the `testSetup()` function in Apps Script to verify:
-- Spreadsheet access
-- Drive folder access
-- Sheet creation
-- Permissions
-
-## Privacy & Consent
-
-The app includes built-in consent mechanisms:
-- Clear data usage explanation
-- Optional face blurring for photos
-- Client-side IP hashing (no raw IP storage)
-- Community-focused data collection
-
-## License
-
-This project is open source. Feel free to modify and adapt for your community mapping needs.
-
-## Support
-
-For issues or questions:
-1. Check the browser console for errors
-2. Review Apps Script execution logs
-3. Verify all configuration values
-4. Test with the provided test functions
+1. **Review Submissions**: The team regularly reviews new entries in the Google Sheet.
+2. **Clean and Standardize**: They clean up text, standardize labels (e.g., ensuring "Main St" and "Main Street" are consistent), and verify the information.
+3. **Analyze and Visualize**: The clean data can be exported as a CSV or GeoJSON file and imported into GIS software (like QGIS or ArcGIS) or data visualization tools (like Tableau).
+4. **Create Outputs**: From this data, the team can create:
+   * Public-facing service maps.
+   * Heatmaps showing service gaps.
+   * Dashboards for local councils.
+   * Briefing pages for ministries.
+   * Evidence-based reports to support policy changes.
+   * And more.
